@@ -2,4 +2,4 @@
 backend/myenv/
 
 # Ignore Node.js dependencies
-frontend/node_modules/
+frontend/ecoride/node_modules/
