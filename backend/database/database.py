@@ -13,6 +13,7 @@ class Database:
     def disconnect(self):
         if self.connection is not None:
             self.connection.close()
+            self.connection =None
 
     def create_user(self, first_name, last_name, email, date_of_birth,
                     phone, address, country, city, province, postal_code, salt, hash):
@@ -22,7 +23,7 @@ class Database:
                        (address, country, city, province, postal_code))
         address_id = cursor.lastrowid
         cursor.execute(
-            "INSERT INTO users(first_name,last_name,email,address_id,date_of_birth,phone,salt,hash) VALUES(?,?,?,?,?,?,?,?,?)",
+            "INSERT INTO users(first_name,last_name,email,address_id,date_of_birth,phone,salt,hash) VALUES(?,?,?,?,?,?,?,?)",
             (first_name, last_name, email, address_id, date_of_birth, phone, salt, hash))
         connection.commit()
 

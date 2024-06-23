@@ -76,18 +76,25 @@
     </div>
 </template>
 <script lang="ts">
-import { defineComponent, reactive } from 'vue'
-import { register } from './register'
+import { defineComponent, inject, reactive } from 'vue'
+import { register, RegisterUser } from './register'
 
 export default defineComponent({
     name: 'Register',
     setup() {
+        const registerUser = inject('regitsre') as RegisterUser;
         const state = reactive({
             model: {} as register
         })
+        const submitForm = async () => {
+            const register = await registerUser.registerUser(state.model);
+            console.log(register)
+        }
 
         return {
-            state
+            state,
+            registerUser,
+            submitForm
         }
 
     },

@@ -1,3 +1,4 @@
+import axios from 'axios'
 export interface register {
   firstName: string
   lastName: string
@@ -11,4 +12,21 @@ export interface register {
   phone: string
   password: string
   confirmPassword: string
+}
+
+export class RegisterUser {
+  private url: string
+
+  constructor(url: string) {
+    this.url = url
+  }
+
+  public async registerUser(model: register): Promise<any> {
+    try {
+      const response = await axios.post(this.url, model)
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  }
 }
