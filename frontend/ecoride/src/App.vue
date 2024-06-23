@@ -1,7 +1,6 @@
 <template>
   <NavBar />
   <router-view></router-view>
-  <!-- <childRouter /> -->
 </template>
 
 <script lang="ts">

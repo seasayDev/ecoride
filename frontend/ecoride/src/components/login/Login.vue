@@ -1,7 +1,6 @@
 <template>
     <div class="container">
         <div class="row justify-content-center">
-
             <form @submit.prevent="submit()" class="login_form">
                 <div class="form-group">
                     <label for="inputEmail">Email address</label>
@@ -18,7 +17,6 @@
 
                 <div class="register" @click="register">register</div>
             </form>
-
         </div>
     </div>
 </template>
@@ -59,7 +57,7 @@ export default defineComponent({
 }
 
 .login_form {
-    background: #fff;
+    background: #415a77;
     padding: 2rem;
     border-radius: 0.5rem;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
