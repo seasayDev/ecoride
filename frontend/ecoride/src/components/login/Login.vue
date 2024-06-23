@@ -11,7 +11,7 @@
                 <div class="form-group">
                     <label for="inputPassword1">Password</label>
                     <input type="password" class="form-control" id="inputPassword1" placeholder="Password"
-                        v-model="state.model.passeword">
+                        v-model="state.model.password">
                 </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
 
@@ -21,19 +21,21 @@
     </div>
 </template>
 <script lang="ts">
-import { defineComponent, reactive } from 'vue'
-import { loginModel } from './login';
+import { defineComponent, inject, reactive } from 'vue'
+import { loginModel, LoginUser } from './login';
 import { useRouter } from "vue-router";
 export default defineComponent({
     name: 'Login',
     setup() {
+        const loginUser = inject('loginUser') as LoginUser;
         const router = useRouter();
         const state = reactive({
             model: {} as loginModel
         })
 
         const submit = () => {
-            console.log(state.model)
+            const login = loginUser.connexion(state.model);
+            console.log(login)
         }
         const register = () => {
             router.push('/register')
@@ -42,7 +44,8 @@ export default defineComponent({
         return {
             state,
             submit,
-            register
+            register,
+            loginUser
         }
 
     },
