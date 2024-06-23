@@ -22,7 +22,7 @@ install: setup
 # Target to run the Flask application
 run: install
 	@echo "Running Flask application..."
-	. myenv/bin/activate; python main.py
+	. myenv/bin/activate && FLASK_APP=main.py FLASK_ENV=development flask run --host=127.0.0.1 --port=5000
 
 # Target to clean the project
 clean:
