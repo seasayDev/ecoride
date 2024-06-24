@@ -5,20 +5,44 @@
                 <router-link to="/">Home</router-link>
             </li>
             <li>
-                <router-link to="/login">Connexion</router-link>
+                <router-link to="/login" v-if="!userStore.user">Connexion</router-link>
             </li>
             <li>
-                <router-link to="/login">Deconnexion</router-link>
+                <router-link v-if="userStore.user" to="/" @click.prevent="deconnexion">Deconnexion</router-link>
             </li>
         </ul>
     </nav>
 </template>
   
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { useRouter } from "vue-router";
+import { defineComponent, onMounted, reactive, watch } from 'vue';
+import { userStore, setUser, getUserFromStorage } from "./helpers/userSession";
 
 export default defineComponent({
-    name: 'NavBar'
+    name: 'NavBar',
+    setup() {
+        const router = useRouter();
+
+        const state = reactive({
+            user: {} as Object | null
+        })
+
+        getUserFromStorage();
+
+        const deconnexion = () => {
+            setUser(null);
+            state.user = null
+            router.push("/")
+        }
+
+        return {
+            state,
+            deconnexion,
+            router,
+            userStore
+        }
+    }
 });
 </script>
   

@@ -28,6 +28,7 @@
 import { defineComponent, inject, reactive } from 'vue'
 import { loginModel, LoginUser } from './login';
 import { useRouter } from "vue-router";
+import { setUser } from '../helpers/userSession';
 export default defineComponent({
     name: 'Login',
     setup() {
@@ -40,7 +41,8 @@ export default defineComponent({
 
         const submit = async () => {
             try {
-                await loginUser.connexion(state.model);
+                const user = await loginUser.connexion(state.model);
+                setUser(user)
                 router.push('/')
             } catch (e) {
                 state.error = true;
