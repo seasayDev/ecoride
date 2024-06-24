@@ -6,7 +6,7 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 
-import NavBar from "./components/NavBar.vue";
+import NavBar from "./components/navBar/NavBar.vue";
 import Home from '@/components/home/Home.vue'
 
 export default defineComponent({

@@ -12,10 +12,16 @@ export class LoginUser {
 
   public async connexion(model: loginModel): Promise<any> {
     try {
-      const response = await axios.post(this.url, model)
+      const response = await axios.post(this.url + '/login', model)
       return response.data
     } catch (error) {
       throw error
     }
+  }
+  public async deconnexion(id_user: string) {
+    try {
+      const response = await axios.post(this.url + '/logout', { id: id_user })
+      return response.data
+    } catch (e) {}
   }
 }

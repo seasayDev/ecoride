@@ -4,9 +4,9 @@ from database.database import Database
 import hashlib
 import uuid
 from flask_mail import Mail, Message
-import yaml
-import string
-import secrets
+# import yaml
+# import string
+# import secrets
 
 
 app =Flask(__name__)
@@ -77,18 +77,22 @@ def login():
     if hashed_password == hash_p and username == email:
         # Access granted
         id_session = uuid.uuid4().hex
-        get_db().save_session(id_session, username, name, role)
-        session['user'] = {
-            'id': id_session,
-            'name': name,
-            'fname': fname,
-            'role': role,
-            'email': username,
-            'id_user': user_id
-        }
-        return jsonify({"message": "Login successful", "session": session['user']}), 200
+        user = get_db().save_session(id_session, username, fname, role)
+        sessionUser = {'id': user[0],
+                               'email': user[1],
+                               'fname': user[2],
+                               'role': user[3],}
+        return jsonify({"message": "Login successful", "session": sessionUser}), 200
     else:
         return jsonify({"error": "Invalid password"}), 401
+
+@app.route('/logout',methods=['POST'])
+def deconnexion():
+    data = request.get_json()
+    print(data)
+    id_session = data.get('id')
+    get_db().delete_session(id_session)
+    return jsonify({'message': 'User logged out'}), 201
 
 @app.route('/resetPassword',methods=['POST'])
 def resetPassword():
@@ -97,6 +101,7 @@ def resetPassword():
 @app.route('/',methods=['GET'])
 def greetings():
     return ("hello word")
+
 
 
 if __name__=="__main__":

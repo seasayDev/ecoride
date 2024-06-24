@@ -50,9 +50,15 @@ class Database:
 
     def save_session(self, id_session, email, name, role):
         connection = self.get_connection()
-        connection.execute(("insert into sessions(id_session, email,name,user_type) "
-                            "values(?,?,?,?)"), (id_session, email, name, role))
+        cursor = connection.cursor()
+        # Insert the session data into the database
+        cursor.execute("INSERT INTO sessions(id_session, email, name, user_type) VALUES (?, ?, ?, ?)", 
+                       (id_session, email, name, role))
         connection.commit()
+        cursor.execute("SELECT id_session, email, name, user_type FROM sessions WHERE id_session = ?", (id_session,))
+        userSession = cursor.fetchone()
+        return userSession
+    
 
     def delete_session(self, id_session):
         connection = self.get_connection()

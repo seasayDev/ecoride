@@ -16,12 +16,13 @@
   
 <script lang="ts">
 import { useRouter } from "vue-router";
-import { defineComponent, onMounted, reactive, watch } from 'vue';
-import { userStore, setUser, getUserFromStorage } from "./helpers/userSession";
-
+import { defineComponent, onMounted, reactive, watch, inject } from 'vue';
+import { userStore, setUser, getUserFromStorage } from "@/components/helpers/userSession";
+import { LoginUser } from '../login';
 export default defineComponent({
     name: 'NavBar',
     setup() {
+        const loginUser = inject('loginUser') as LoginUser;
         const router = useRouter();
 
         const state = reactive({
@@ -31,8 +32,8 @@ export default defineComponent({
         getUserFromStorage();
 
         const deconnexion = () => {
+            loginUser.deconnexion(userStore.user?.id)
             setUser(null);
-            state.user = null
             router.push("/")
         }
 
@@ -40,7 +41,8 @@ export default defineComponent({
             state,
             deconnexion,
             router,
-            userStore
+            userStore,
+            loginUser
         }
     }
 });

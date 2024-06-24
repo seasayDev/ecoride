@@ -4,8 +4,6 @@ interface User {
   email?: string
   fname?: string
   id?: string
-  id_user?: string
-  name?: string
   role?: string
 }
 
