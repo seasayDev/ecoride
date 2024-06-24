@@ -40,6 +40,10 @@ def inscription():
         return jsonify({"error": "Tous les champs sont obligatoires."}), 400
     if password != password1:
         return jsonify({"error": "Les mots de passes ne sont pas identiques!"}), 401
+    user = get_db().get_user_by_email(email)
+    print(user)
+    if(user == email):
+        return jsonify({"error": "user already exist"}), 403
     # Hash the password
     salt = uuid.uuid4().hex
     hashed_password = hashlib.sha512((password + salt).encode("utf-8")).hexdigest()

@@ -5,7 +5,10 @@
                 <router-link to="/">Home</router-link>
             </li>
             <li>
-                <router-link to="/login">Login</router-link>
+                <router-link to="/login">Connexion</router-link>
+            </li>
+            <li>
+                <router-link to="/login">Deconnexion</router-link>
             </li>
         </ul>
     </nav>

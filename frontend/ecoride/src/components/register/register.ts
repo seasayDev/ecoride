@@ -26,7 +26,8 @@ export class RegisterUser {
       const response = await axios.post(this.url, model)
       return response.data
     } catch (error) {
-      throw error
+      console.log(response.error)
+      return response.error
     }
   }
 }
