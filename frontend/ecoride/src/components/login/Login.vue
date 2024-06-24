@@ -1,24 +1,23 @@
 <template>
     <div>
         <div class="alert alert-danger" role="alert" v-if="state.error">
-            Wrong password !
+            Mot de passe incorrect !
         </div>
         <div class="container">
             <div class="row justify-content-center">
                 <form @submit.prevent="submit()" class="login_form">
                     <div class="form-group">
-                        <label for="inputEmail">Email address</label>
+                        <label for="inputEmail">Adresse électronique</label>
                         <input type="email" class="form-control" id="inputEmail" aria-describedby="emailHelp"
-                            placeholder="Enter email" v-model="state.model.email">
-
+                            placeholder="Entrez l'email" v-model="state.model.email">
                     </div>
                     <div class="form-group">
-                        <label for="inputPassword1">Password</label>
-                        <input type="password" class="form-control" id="inputPassword1" placeholder="Password"
+                        <label for="inputPassword1">Mot de passe</label>
+                        <input type="password" class="form-control" id="inputPassword1" placeholder="Mot de passe"
                             v-model="state.model.password">
                     </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                    <div class="register" @click="register">register</div>
+                    <button type="submit" class="btn btn-primary">Soumettre</button>
+                    <div class="register" @click="register">s'inscrire</div>
                 </form>
             </div>
         </div>
@@ -69,6 +68,7 @@ export default defineComponent({
     align-items: center;
     justify-content: center;
     min-height: 100vh;
+
 }
 
 .login_form {
@@ -76,6 +76,8 @@ export default defineComponent({
     padding: 2rem;
     border-radius: 0.5rem;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    color: white;
+    box-shadow: 0px 0px 16px 3px rgba(0, 0, 0, 0.53);
 }
 
 .form-group {
