@@ -55,8 +55,7 @@ export default defineComponent({
             state,
             submit,
             register,
-            loginUser,
-            isLoged
+            loginUser
         }
 
     },
