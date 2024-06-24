@@ -3,6 +3,10 @@ from flask_cors import CORS
 from database.database import Database
 import hashlib
 import uuid
+from flask_mail import Mail, Message
+import yaml
+import string
+import secrets
 
 
 app =Flask(__name__)
@@ -86,14 +90,13 @@ def login():
     else:
         return jsonify({"error": "Invalid password"}), 401
 
+@app.route('/resetPassword',methods=['POST'])
+def resetPassword():
+    return jsonify({'message':"email reset sended"}), 201
 
 @app.route('/',methods=['GET'])
 def greetings():
     return ("hello word")
-
-@app.route('/shark',methods=['GET'])
-def shark():
-    return ("hello, this is a new shark your calling from flask app")
 
 
 if __name__=="__main__":

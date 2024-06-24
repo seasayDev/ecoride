@@ -17,7 +17,10 @@
                             v-model="state.model.password">
                     </div>
                     <button type="submit" class="btn btn-primary">Soumettre</button>
-                    <div class="register" @click="register">s'inscrire</div>
+                    <div>
+                        <div class="register" @click="register">s'inscrire</div>
+                        <div class="resetPassword" @click="resetPassword">Mot de passe oublie?</div>
+                    </div>
                 </form>
             </div>
         </div>
@@ -48,6 +51,9 @@ export default defineComponent({
             }
 
         }
+        const resetPassword = () => {
+            router.push('/resetPassword')
+        }
         const register = () => {
             router.push('/register')
         }
@@ -56,7 +62,8 @@ export default defineComponent({
             state,
             submit,
             register,
-            loginUser
+            loginUser,
+            resetPassword
         }
 
     },
@@ -72,7 +79,7 @@ export default defineComponent({
 }
 
 .login_form {
-    background: #415a77;
+    background: var(--cyan-blue);
     padding: 2rem;
     border-radius: 0.5rem;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
@@ -95,6 +102,11 @@ export default defineComponent({
 }
 
 .register:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.resetPassword:hover {
     text-decoration: underline;
     cursor: pointer;
 }

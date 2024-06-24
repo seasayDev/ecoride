@@ -111,7 +111,7 @@ export default defineComponent({
 </script>
 <style scoped>
 .container {
-    background-color: #778da9;
+    background-color: var(--blue-light);
     padding: 20px;
     border-radius: 8px;
 }
