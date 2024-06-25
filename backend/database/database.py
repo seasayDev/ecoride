@@ -154,17 +154,6 @@ class Database:
             (address, country, city, province, postal_code, id_address))
         cur.connection.commit()
 
-    def get_user_id(self, id):
-        cursor = self.get_connection().cursor()
-        cursor.execute(("select * from users where id_user=?"), (id,))
-        user = cursor.fetchall()
-        if not user:  # Si la liste est vide
-            return None
-        elif len(user) > 1:  # Si la liste contient plusieurs éléments
-            raise ValueError("La requête retourne plusieurs utilisateurs.")
-        else:
-            return user[0]  # Renvoyer le premier élément de la liste
-
     def get_user_adress(self, idUser):
         cursor = self.get_connection().cursor()
         cursor.execute(("select address_id from users where id_user=?"),
