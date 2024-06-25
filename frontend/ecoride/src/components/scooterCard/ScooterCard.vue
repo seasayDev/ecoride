@@ -17,4 +17,8 @@ export default defineComponent({
     },
 })
 </script>
-<style scoped></style>
+<style scoped>
+.card {
+    margin: 1rem;
+}
+</style>
