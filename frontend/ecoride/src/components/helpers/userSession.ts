@@ -1,6 +1,10 @@
 import { reactive } from 'vue'
 
 interface User {
+  message: string
+  session: session
+}
+interface session {
   email?: string
   fname?: string
   id?: string

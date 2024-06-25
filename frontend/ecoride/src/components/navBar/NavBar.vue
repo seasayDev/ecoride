@@ -32,7 +32,7 @@ export default defineComponent({
         getUserFromStorage();
 
         const deconnexion = () => {
-            loginUser.deconnexion(userStore.user?.id)
+            loginUser.deconnexion(userStore.user?.session.id)
             setUser(null);
             router.push("/")
         }

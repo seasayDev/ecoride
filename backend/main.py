@@ -7,6 +7,7 @@ from flask_mail import Mail, Message
 # import yaml
 # import string
 # import secrets
+from bcrypt import hashpw, gensalt,checkpw
 
 
 app =Flask(__name__)
@@ -26,70 +27,56 @@ def get_db():
 @app.route('/register', methods=['POST'])
 def inscription():
     data = request.get_json()
-    nom = data.get("lastName")
-    prenom = data.get("firstName")
-    pays = data.get("country")
-    addresse = data.get("address")
-    ville = data.get("city")
-    province = data.get("province")
-    code_postal = data.get("postalCode")
-    date_de_naissance = data.get("birthdate")
-    email = data.get("email")
-    phone = data.get("phone")
-    password = data.get("password")
-    password1 = data.get("confirmPassword")
+    required_fields = ["lastName", "firstName", "country", "address", "city",
+                       "province", "postalCode", "birthdate", "email", "phone",
+                       "password", "confirmPassword"]
+    if not all(data.get(field) for field in required_fields):
+        return jsonify({"error": "All fields are required."}), 400
 
-    # Vérifier que les champs ne sont pas vides
-    if not all([nom, prenom, password, email, pays, addresse, ville, province, code_postal, date_de_naissance, phone, password1]):
-        return jsonify({"error": "Tous les champs sont obligatoires."}), 400
-    if password != password1:
-        return jsonify({"error": "Les mots de passes ne sont pas identiques!"}), 401
-    user = get_db().get_user_by_email(email)
-    print(user)
-    if(user == email):
-        return jsonify({"error": "user already exist"}), 403
-    # Hash the password
+    if data['password'] != data['confirmPassword']:
+        return jsonify({"error": "Passwords do not match."}), 401
+
+    if get_db().get_user_by_email(data['email']):
+        return jsonify({"error": "User already exists"}), 403
+
+    # Securely hash the password
     salt = uuid.uuid4().hex
-    hashed_password = hashlib.sha512((password + salt).encode("utf-8")).hexdigest()
-    db = get_db()
-    db.create_user(prenom, nom, email, date_de_naissance, phone,
-                   addresse, pays, ville, province, code_postal, salt, hashed_password)
-    return jsonify({"message": "Inscription reussie!"}), 201
+    hashed_password = hashpw((data['password'] + salt).encode('utf-8'), gensalt()).decode('utf-8')
+    get_db().create_user(data['firstName'], data['lastName'], data['email'], data['birthdate'], data['phone'],
+                         data['address'], data['country'], data['city'], data['province'], 
+                         data['postalCode'], salt, hashed_password)
+    
+    return jsonify({"message": "Registration successful!"}), 201
 
 @app.route('/login',methods=['POST'])
 def login():
     data = request.get_json()
     username = data.get('email')
     password = data.get('password')
-    if username == "" or password == "":
-        return jsonify({"error", "Ivalide password or username"}),400
+    if not username or not password:
+        return jsonify({"error": "Invalid password or username"}), 400
     user = get_db().get_user(username)
-    if user is None:
-        return jsonify({'error',"User does not exist"}),401
-    salt = user[0]
-    hash_p = user[1]
-    fname = user[2]
-    name = user[3]
-    role = user[4]
-    email = user[5]
-    user_id = user[6]
-    hashed_password = hashlib.sha512((password + salt).encode("utf-8")).hexdigest()
-    if hashed_password == hash_p and username == email:
-        # Access granted
+    if not user:
+        return jsonify({"error": "User does not exist"}), 401
+    salt, hash_p, fname, name, role, email, user_id = user
+    hashed_password = hashpw(password.encode(), gensalt())
+
+    if checkpw(password.encode(), hashed_password) and username == email:
         id_session = uuid.uuid4().hex
-        user = get_db().save_session(id_session, username, fname, role)
-        sessionUser = {'id': user[0],
-                               'email': user[1],
-                               'fname': user[2],
-                               'role': user[3],}
-        return jsonify({"message": "Login successful", "session": sessionUser}), 200
+        get_db().save_session(id_session, username, fname, role)
+        session_user = {
+            'id': id_session, 
+            'email': email,
+            'fname': fname,
+            'role': role,
+        }
+        return jsonify({"message": "Login successful", "session": session_user}), 200
     else:
         return jsonify({"error": "Invalid password"}), 401
 
 @app.route('/logout',methods=['POST'])
 def deconnexion():
     data = request.get_json()
-    print(data)
     id_session = data.get('id')
     get_db().delete_session(id_session)
     return jsonify({'message': 'User logged out'}), 201
