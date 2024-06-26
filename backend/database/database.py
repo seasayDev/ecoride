@@ -423,3 +423,34 @@ class Database:
         cursor.execute('SELECT * FROM trotinette where id_trotinette=? ', (id,))
         trotinette = cursor.fetchone()
         return trotinette
+    
+
+    def create_support_request(self, user_id, support_option, message):
+        connection = self.get_connection()
+        cursor = connection.cursor()
+        cursor.execute(
+            "INSERT INTO support_requests (user_id, support_option, message) VALUES (?, ?, ?)",
+            (user_id, support_option, message)
+        )
+        connection.commit()
+        return cursor.lastrowid
+
+    def get_support_request(self, request_id):
+        cursor = self.get_connection().cursor()
+        cursor.execute("SELECT * FROM support_requests WHERE id = ?", (request_id,))
+        return cursor.fetchone()
+
+    def update_support_request_status(self, request_id, status):
+        connection = self.get_connection()
+        cursor = connection.cursor()
+        cursor.execute(
+            "UPDATE support_requests SET status = ? WHERE id = ?",
+            (status, request_id)
+        )
+        connection.commit()
+
+    def delete_support_request(self, request_id):
+        connection = self.get_connection()
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM support_requests WHERE id = ?", (request_id,))
+        connection.commit()
