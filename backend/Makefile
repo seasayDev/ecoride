@@ -21,6 +21,8 @@ install: setup
 
 # Target to run the Flask application
 run: install
+	@echo "Checking and freeing port 5000 if necessary..."
+	@fuser -k 5000/tcp || true
 	@echo "Running Flask application..."
 	. myenv/bin/activate && FLASK_APP=main.py FLASK_ENV=development flask run --host=127.0.0.1 --port=5000
 

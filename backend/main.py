@@ -4,9 +4,9 @@ from database.database import Database
 import hashlib
 import uuid
 from flask_mail import Mail, Message
-# import yaml
-# import string
-# import secrets
+import yaml
+import string
+import secrets
 from bcrypt import hashpw, gensalt,checkpw
 
 
@@ -83,11 +83,23 @@ def deconnexion():
 
 @app.route('/resetPassword',methods=['POST'])
 def resetPassword():
+    data = request.get_json()
+    email = data.get('email')
+    user_id = get_db().get_user_id_by_email(email)
+    if not user_id:
+        return jsonify({'error':'user does not exist'}),400
+    alphabet = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(secrets.choice(alphabet) for i in range(10))
+    salt = uuid.uuid4().hex
+    hashed_password = hashpw((password + salt).encode('utf-8'), gensalt()).decode('utf-8')
+    db = get_db()
+    db.update_user_password(user_id,salt,hashed_password)
+    # TODO add email html page 
     return jsonify({'message':"email reset sended"}), 201
 
 @app.route('/',methods=['GET'])
 def greetings():
-    return ("hello word")
+    return ("hello INF6150")
 
 
 

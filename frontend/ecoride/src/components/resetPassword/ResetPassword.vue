@@ -6,29 +6,33 @@
             <div class="form-group">
                 <label for="inputEmail">Adresse électronique</label>
                 <input type="email" class="form-control" id="inputEmail" aria-describedby="emailHelp"
-                    placeholder="Entrez l'email" v-model="state.email">
+                    placeholder="Entrez l'email" v-model="state.model.email">
             </div>
             <button type="submit" class="btn btn-primary">Soumettre</button>
         </form>
     </div>
 </template>
 <script lang="ts">
-import { defineComponent, reactive } from 'vue'
+import { defineComponent, reactive, inject } from 'vue'
+import type { ResetPassword, resetEmailModel } from './resetPassword'
+
 
 export default defineComponent({
     name: "ResetPassword",
     setup() {
+        const resetPassword = inject('resetPassword') as ResetPassword
         const state = reactive({
-            email: ''
+            model: {} as resetEmailModel
         })
 
-        const submitForm = () => {
-            console.log('reste form')
+        const submitForm = async () => {
+            await resetPassword.resetPassword(state.model)
         }
 
         return {
             state,
-            submitForm
+            submitForm,
+            resetPassword
         }
 
 

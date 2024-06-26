@@ -46,6 +46,15 @@ class Database:
             return None
         else:
             return user[0]
+    def get_user_id_by_email(self,email):
+        cursor = self.get_connection().cursor()
+        cursor.execute(("select id_user from users where email=?"),
+                       (email,))
+        user = cursor.fetchone()
+        if user is None:
+            return None
+        else:
+            return user[0]
 
 
     def save_session(self, id_session, email, name, role):
