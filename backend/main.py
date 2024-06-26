@@ -90,17 +90,17 @@ def greetings():
     return ("hello word")
 
 
-@app.route('/support', methods=['POST'])  # NEW
-def submit_support_request():  # NEW
-    data = request.json  # NEW
-    user_id = data.get('user_id')  # NEW
-    support_option = data.get('support_option')  # NEW
-    message = data.get('message')  # NEW
+@app.route('/support', methods=['POST'])  
+def submit_support_request():  
+    data = request.json  
+    user_id = data.get('user_id')  
+    support_option = data.get('support_option')  
+    message = data.get('message')  
 
-    if not user_id or not support_option or not message:  # NEW
-        return jsonify({'error': 'Missing data'}), 400  # NEW
+    if not user_id or not support_option or not message:  
+        return jsonify({'error': 'Missing data'}), 400  
 
-    support_request_id = get_db().create_support_request(user_id, support_option, message)  # NEW
+    support_request_id = get_db().create_support_request(user_id, support_option, message) 
     return jsonify({'message': 'Support request submitted successfully', 'request_id': support_request_id}), 200 
 
 
