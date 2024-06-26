@@ -102,6 +102,19 @@ def greetings():
     return ("hello INF6150")
 
 
+@app.route('/support', methods=['POST'])  
+def submit_support_request():  
+    data = request.json  
+    user_id = data.get('user_id')  
+    support_option = data.get('support_option')  
+    message = data.get('message')  
+
+    if not user_id or not support_option or not message:  
+        return jsonify({'error': 'Missing data'}), 400  
+
+    support_request_id = get_db().create_support_request(user_id, support_option, message) 
+    return jsonify({'message': 'Support request submitted successfully', 'request_id': support_request_id}), 200 
+
 
 if __name__=="__main__":
     app.run(debug=True)

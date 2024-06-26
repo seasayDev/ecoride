@@ -77,3 +77,13 @@ CREATE TABLE IF NOT EXISTS pictures (
     id_pictures VARCHAR(32) PRIMARY KEY,
     data BLOB
 );
+
+CREATE TABLE IF NOT EXISTS support_requests (
+    id INTEGER PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    support_option VARCHAR(50) NOT NULL,
+    message TEXT NOT NULL,
+    status VARCHAR(20) DEFAULT 'Pending',
+    FOREIGN KEY (user_id) REFERENCES users (id_user)
+);
+
