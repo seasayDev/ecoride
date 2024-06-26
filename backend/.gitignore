@@ -1,2 +1,4 @@
 myenv/
 __pycahce__/
+backend/database/data.db
+*.pyc
