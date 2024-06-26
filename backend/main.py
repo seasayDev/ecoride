@@ -90,6 +90,19 @@ def greetings():
     return ("hello word")
 
 
+@app.route('/support', methods=['POST'])  # NEW
+def submit_support_request():  # NEW
+    data = request.json  # NEW
+    user_id = data.get('user_id')  # NEW
+    support_option = data.get('support_option')  # NEW
+    message = data.get('message')  # NEW
+
+    if not user_id or not support_option or not message:  # NEW
+        return jsonify({'error': 'Missing data'}), 400  # NEW
+
+    support_request_id = get_db().create_support_request(user_id, support_option, message)  # NEW
+    return jsonify({'message': 'Support request submitted successfully', 'request_id': support_request_id}), 200 
+
 
 if __name__=="__main__":
     app.run(debug=True)
