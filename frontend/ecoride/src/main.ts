@@ -9,9 +9,9 @@ import { RegisterUser } from './components/register/register'
 import { LoginUser } from './components/login/login'
 import { ResetPassword } from '@/components/resetPassword/resetPassword'
 const app = createApp(App)
-
+const backURL = 'http://127.0.0.1:5000' // back end url to send  api requests
 app.use(router)
-app.provide('regitsre', new RegisterUser('http://127.0.0.1:5000/register'))
-app.provide('loginUser', new LoginUser('http://127.0.0.1:5000'))
-app.provide('resetPassword', new ResetPassword('http://127.0.0.1:5000'))
+app.provide('regitsre', new RegisterUser(backURL + '/register'))
+app.provide('loginUser', new LoginUser(backURL))
+app.provide('resetPassword', new ResetPassword(backURL))
 app.mount('#app')
