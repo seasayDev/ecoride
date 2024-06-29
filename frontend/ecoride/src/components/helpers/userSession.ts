@@ -1,30 +1,32 @@
-import { reactive } from 'vue'
+import { reactive } from 'vue';
 
 interface User {
-  message: string
-  session: session
+  message: string;
+  session: Session;
 }
-interface session {
-  email?: string
-  fname?: string
-  id?: string
-  role?: string
+
+interface Session {
+  email?: string;
+  fname?: string;
+  id?: string;
+  role?: string;
+  user_id?: string;
 }
 
 export const userStore = reactive({
-  user: null as User | null
-})
+  user: null as User | null,
+});
 
 export function setUser(user: User | null) {
-  userStore.user = user
+  userStore.user = user;
   if (user) {
-    sessionStorage.setItem('user', JSON.stringify(user))
+    sessionStorage.setItem('user', JSON.stringify(user));
   } else {
-    sessionStorage.removeItem('user')
+    sessionStorage.removeItem('user');
   }
 }
 
 export function getUserFromStorage() {
-  const userData = sessionStorage.getItem('user')
-  userStore.user = userData ? JSON.parse(userData) : null
+  const userData = sessionStorage.getItem('user');
+  userStore.user = userData ? JSON.parse(userData) : null;
 }

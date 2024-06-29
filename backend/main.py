@@ -17,6 +17,9 @@ app.secret_key = 'Xp2s5v8y/B?D(G+KbPeShVmYq3t6w9z$'
 
 CORS(app,resources={r"/*":{'origins':"*"}})
 # CORS(app,resources={r"/*":{'origins':'http://localhost:8080',"allow_headers":"Acces-Control-Allow-Origins"}})
+
+CORS(app, supports_credentials=True)  # Ajoutez supports_credentials=True
+
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
@@ -114,6 +117,29 @@ def submit_support_request():
 
     support_request_id = get_db().create_support_request(user_id, support_option, message) 
     return jsonify({'message': 'Support request submitted successfully', 'request_id': support_request_id}), 200 
+
+
+
+@app.route('/profil', methods=['GET'])
+def get_user():
+    user_id = request.args.get('user_id')
+    
+    if not user_id:
+        return jsonify({"error": "User not logged in"}), 401
+
+    try:
+        user_id = int(user_id)
+    except ValueError:
+        return jsonify({"error": "Invalid user ID"}), 400
+
+    profil = get_db().get_user_info(user_id)
+    if not profil:
+        return jsonify({"error": "User not found"}), 404
+
+    print(profil)
+    return jsonify(profil), 200
+    
+
 
 
 if __name__=="__main__":

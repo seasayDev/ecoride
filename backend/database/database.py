@@ -463,3 +463,30 @@ class Database:
         cursor = connection.cursor()
         cursor.execute("DELETE FROM support_requests WHERE id = ?", (request_id,))
         connection.commit()
+
+
+
+    def get_user_info(self, id_user):
+        cursor = self.get_connection().cursor()
+        cursor.execute(("SELECT users.first_name, users.last_name, users.email, users.date_of_birth, users.phone, " +
+                        "addresses.address, addresses.country, addresses.city, addresses.province, addresses.postal_code " +
+                        "FROM users " +
+                        "JOIN addresses ON users.address_id = addresses.id_address " +
+                        "WHERE users.id_user = ?"),
+                       (id_user,))
+        user = cursor.fetchone()
+        if user is None:
+            return None
+        else:
+            return {
+                'firstName': user[0],
+                'lastName': user[1],
+                'email': user[2],
+                'dateOfBirth': user[3],
+                'phone': user[4],
+                'address': user[5],
+                'country': user[6],
+                'city': user[7],
+                'province': user[8],
+                'postalCode': user[9]
+            }

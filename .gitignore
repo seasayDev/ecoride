@@ -4,3 +4,7 @@ backend/__pycahce__/
 
 # Ignore Node.js dependencies
 frontend/ecoride/node_modules/
+
+# Ignorer le dossier cache vscode 
+
+frontend/ecoride/.vscode

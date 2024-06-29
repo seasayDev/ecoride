@@ -11,6 +11,10 @@
                 <router-link v-if="userStore.user" to="/support">Support</router-link>
             </li>
             <li>
+                <router-link v-if="userStore.user" to="/profil">Profil</router-link>
+            </li>
+            
+            <li>
                 <router-link v-if="userStore.user" to="/" @click.prevent="deconnexion">Deconnexion</router-link>
             </li>
         </ul>
