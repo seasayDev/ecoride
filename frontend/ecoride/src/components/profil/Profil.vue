@@ -71,12 +71,12 @@
       const fetchProfile = async () => {
         try {
           getUserFromStorage();
-          //const userId = userStore.user?.session.user_id;
-          console.log(userStore.user?.session.user_id);
-          const userId = "1";
-         
-          if (userId) {
-            const data = await profileService.getUserProfile(userId);
+          const email = userStore.user?.session.email;
+
+          console.log(userStore.user?.session.email);
+                   
+          if (email) {
+            const data = await profileService.getUserProfile(email);
             state.profile = data;
           } else {
             state.error = true;

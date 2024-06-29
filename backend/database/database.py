@@ -466,14 +466,14 @@ class Database:
 
 
 
-    def get_user_info(self, id_user):
+    def get_user_info(self, email):
         cursor = self.get_connection().cursor()
         cursor.execute(("SELECT users.first_name, users.last_name, users.email, users.date_of_birth, users.phone, " +
                         "addresses.address, addresses.country, addresses.city, addresses.province, addresses.postal_code " +
                         "FROM users " +
                         "JOIN addresses ON users.address_id = addresses.id_address " +
-                        "WHERE users.id_user = ?"),
-                       (id_user,))
+                        "WHERE users.email = ?"),
+                       (email,))
         user = cursor.fetchone()
         if user is None:
             return None
