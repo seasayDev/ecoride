@@ -134,6 +134,25 @@ def submit_support_request():
     support_request_id = get_db().create_support_request(user_id, support_option, message) 
     return jsonify({'message': 'Support request submitted successfully', 'request_id': support_request_id}), 200 
 
+@app.route('/getTrotinettes',methods=['GET'])
+def get_trotinettes():
+    data = get_db().get_all_trottinettes()
+    trotinettes = []
+    for row in data:
+        trotinette = {
+            'id_trotinette': row[0],
+            'name': row[1],
+            'category': row[2],
+            'price': row[3],
+            'available': row[4],
+            'location_id': row[5],
+            'image_id': row[6],
+            'qte': row[7]
+        }
+        trotinettes.append(trotinette)
+
+    return jsonify(trotinettes)
+
 
 if __name__=="__main__":
     app.run(debug=True)

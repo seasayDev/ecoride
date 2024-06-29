@@ -241,12 +241,6 @@ class Database:
             blob_data = picture[0]
             return blob_data
 
-    def get_trotinette(self):
-        cursor = self.get_connection().cursor()
-        cursor.execute("SELECT * FROM trotinette")
-        trottinettes = cursor.fetchall()
-        return trottinettes
-
     def get_trotinette_facture(self, idTrotinette):
         cursor = self.get_connection().cursor()
         cursor.execute("SELECT * FROM trotinette where id_trotinette=?", (idTrotinette,))
@@ -328,7 +322,6 @@ class Database:
         if row is None:
             return None
         else:
-            print("blob:",row[1])
             return row[1]
 
     def get_pub(self):
