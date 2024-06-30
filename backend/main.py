@@ -1,5 +1,4 @@
 from flask import Flask, g, jsonify, request, session, render_template
-from flask import Flask, g, jsonify, request, session, render_template
 from flask_cors import CORS
 from database.database import Database
 import hashlib
@@ -9,9 +8,7 @@ import yaml
 import string
 import secrets
 from bcrypt import hashpw, gensalt, checkpw
-from bcrypt import hashpw, gensalt, checkpw
 
-app = Flask(__name__)
 app = Flask(__name__)
 
 app.config.from_object(__name__)
@@ -26,9 +23,6 @@ app.config['MAIL_USERNAME'] = email_settings['email']['username']
 app.config['MAIL_PASSWORD'] = email_settings['email']['password']
 app.config['MAIL_USE_TLS'] = True
 mail = Mail(app)
-
-CORS(app, resources={r"/*": {"origins": "*"}})
-
 
 CORS(app, resources={r"/*": {"origins": "*"}})
 
@@ -63,7 +57,6 @@ def inscription():
     return jsonify({"message": "Registration successful!"}), 201
 
 @app.route('/login', methods=['POST'])
-@app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
     username = data.get('email')
@@ -85,13 +78,11 @@ def login():
             'fname': fname,
             'role': role,
             'id_user': user_id
-            'id_user': user_id
         }
         return jsonify({"message": "Login successful", "session": session_user}), 200
     else:
         return jsonify({"error": "Invalid password"}), 401
 
-@app.route('/logout', methods=['POST'])
 @app.route('/logout', methods=['POST'])
 def deconnexion():
     data = request.get_json()
@@ -99,7 +90,6 @@ def deconnexion():
     get_db().delete_session(id_session)
     return jsonify({'message': 'User logged out'}), 201
 
-@app.route('/resetPassword', methods=['POST'])
 @app.route('/resetPassword', methods=['POST'])
 def resetPassword():
     try:
@@ -114,7 +104,6 @@ def resetPassword():
         hashed_password = hashpw((password + salt).encode('utf-8'), gensalt()).decode('utf-8')
         db = get_db()
         db.update_user_password(user_id, salt, hashed_password)
-        db.update_user_password(user_id, salt, hashed_password)
         recipient = email
         sender = email_settings['email']['sender']
         message = Message(subject='PASSWORD RESETED',
@@ -126,16 +115,26 @@ def resetPassword():
         return jsonify({'message':'Failed to send email'}),500
 
 @app.route('/', methods=['GET'])
-@app.route('/', methods=['GET'])
 def greetings():
     return ("hello INF6150")
 
 @app.route('/support', methods=['GET'])
 def support_page():
-    return render_template('support.html')  # Ajouté pour servir une page HTML pour le support
+    return render_template('support.html')
 
+@app.route('/support', methods=['POST'])
+def submit_support_request():
+    data = request.json
+    user_id = data.get('user_id')
+    support_option = data.get('support_option')
+    message = data.get('message')
 
-@app.route('/getTrotinettes',methods=['GET'])
+    if not user_id or not support_option or not message:
+        return jsonify({'error': 'Missing data'}), 400
+
+    return jsonify({'message': 'Support request received successfully'})
+
+@app.route('/getTrotinettes', methods=['GET'])
 def get_trotinettes():
     data = get_db().get_all_trottinettes()
     trotinettes = []
@@ -168,18 +167,18 @@ def get_trotinettes():
 
     return jsonify(trotinettes)
 
-@app.route('/getLocations',methods=['GET'])
+@app.route('/getLocations', methods=['GET'])
 def get_locations():
     data = get_db().get_all_locations()
     locations = []
     for row in data:
-        location={
-          'id_location':row[0],
-          'name':row[1],
-           'address_id':row[2] 
+        location = {
+            'id_location': row[0],
+            'name': row[1],
+            'address_id': row[2]
         }
         locations.append(location)
     return jsonify(locations)
 
-if __name__=="__main__":
+if __name__ == "__main__":
     app.run(debug=True)

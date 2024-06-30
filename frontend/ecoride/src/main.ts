@@ -13,9 +13,7 @@ import { RegisterUser } from './components/register/register'
 import { LoginUser } from './components/login/login'
 import { ResetPassword } from '@/components/resetPassword/resetPassword'
 import { GetTrotinettes } from './components/admin/admin'
-
 import { SupportService } from '@/components/support/support'
-
 
 const app = createApp(App)
 const backURL = 'http://127.0.0.1:5000' // back end url to send api requests
