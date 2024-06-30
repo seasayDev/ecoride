@@ -27,6 +27,10 @@
                         <label for="lastName" class="form-label">Quantite</label>
                         <input type="text" class="form-control" id="lastName" placeholder="Entrez la quntite" required>
                     </div>
+                    <div class="col-md-4">
+                        <label for="lastName" class="form-label">Categorie</label>
+                        <input type="text" class="form-control" id="lastName" placeholder="Entrez la Categorie" required>
+                    </div>
 
                 </div>
                 <button type="button" class="btn btn-primary mt-5">Submit</button>

@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <table class="table">
+        <table class="table mt-5">
             <thead>
                 <tr>
                     <th scope="col">ID</th>
@@ -8,6 +8,7 @@
                     <th scope="col">Location</th>
                     <th scope="col">Price $/h</th>
                     <th scope="col">Image</th>
+                    <th scope="col">Categorie</th>
                     <th scope="col">Quentite</th>
                     <th scope="col">Modifier</th>
                 </tr>
@@ -19,6 +20,7 @@
                     <td>{{ item.location.name }}</td>
                     <td>{{ item.price }}</td>
                     <td><img src="../../images/scooter1.webp" class="scooter-img" /></td>
+                    <td>{{ item.category }}</td>
                     <td>{{ item.qte }}</td>
                     <td><button class="btn btn-info" @click="editProduct(index)"><i
                                 class="bi bi-pencil-square"></i></button></td>
@@ -27,7 +29,7 @@
 
             </tbody>
         </table>
-        <div>
+        <div class="d-flex justify-content-center align-items-center">
             <button type="button" class="btn btn-primary" @click="showModalAddProduct">Ajouter
                 produit</button>
         </div>

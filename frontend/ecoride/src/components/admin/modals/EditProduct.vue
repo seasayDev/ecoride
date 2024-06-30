@@ -23,12 +23,17 @@
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <label for="firstName" class="form-label">Image</label>
-                        <input type="file" class="form-control" id="firstName" required>
+                        <input type="file" class="form-control" id="firstName" @change="onFileChange" required>
                     </div>
                     <div class="col-md-4">
                         <label for="lastName" class="form-label">Quantite</label>
                         <input type="text" class="form-control" v-model="state.trotinette.qte" id="lastName"
                             placeholder="Entrez la quntite" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="lastName" class="form-label">Categorie</label>
+                        <input type="text" class="form-control" v-model="state.trotinette.category" id="lastName"
+                            placeholder="Entrez la categorie" required>
                     </div>
 
                 </div>
@@ -51,29 +56,52 @@ export default defineComponent({
             required: true
         }
     },
-    emits: ['close'],
+    emits: ['close', 'update'],
     setup(props, { emit }) {
 
         const state = reactive({
-            trotinette: {} as Trotinette
+            trotinette: { ...props.trotinette }
         })
 
         watch(() => props.trotinette, (newValue) => {
-            state.trotinette = newValue
+            state.trotinette = { ...newValue }
         }, { immediate: true })
 
         const closeEditModal = () => {
             emit('close');
         };
+        const onFileChange = (event: Event) => {
+            const input = event.target as HTMLInputElement;
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const validTypes = ['image/webp', 'image/png'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Please select a .webp or .png file.');
+                    input.value = '';
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => {
+                    state.trotinette.image = {
+                        id: state.trotinette.image?.id || null,
+                        data: reader.result as string
+                    };
+                };
+                reader.readAsDataURL(file);
+            }
+        };
 
         const editProduct = () => {
             console.log('props', state.trotinette)
+            emit('update', state.trotinette);
+            closeEditModal();
 
         }
         return {
             closeEditModal,
             state,
-            editProduct
+            editProduct,
+            onFileChange
         };
 
 
