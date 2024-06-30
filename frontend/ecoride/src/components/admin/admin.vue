@@ -7,10 +7,9 @@
                     <th scope="col">Name</th>
                     <th scope="col">Location id</th>
                     <th scope="col">Price $/h</th>
-                    <th scope="col">Image id</th>
+                    <th scope="col">Image</th>
                     <th scope="col">Quentite</th>
-
-
+                    <th scope="col">Modifier</th>
                 </tr>
             </thead>
             <tbody>
@@ -19,8 +18,11 @@
                     <td>{{ item.name }}</td>
                     <td>{{ item.location_id }}</td>
                     <td>{{ item.price }}</td>
-                    <td>{{ item.image_id }}</td>
+                    <td><img src="../../images/scooter1.webp" class="scooter-img" /></td>
                     <td>{{ item.qte }}</td>
+                    <td><button class="btn btn-info" @click="editProduct(index)"><i
+                                class="bi bi-pencil-square"></i></button></td>
+
                 </tr>
 
             </tbody>
@@ -31,25 +33,27 @@
         </div>
 
     </div>
-    <productsModal :isVisible="state.showProductModal" @close="closeModal" />
+    <ProductsModal :isVisible="state.showProductModal" @close="closeModal" />
+    <EditProduct :isVisible="state.showEditProduct" @close="closeEditModal" :trotinette="state.productToEdit" />
 </template>
 <script lang="ts">
 import { defineComponent, inject, onMounted, reactive, ref } from 'vue'
 import { GetTrotinettes, trotinette } from './admin'
-
-
 import ProductsModal from './modals/ProductsModal.vue';
+import EditProduct from './modals/EditProduct.vue';
 
 export default defineComponent({
     components: {
-        ProductsModal
+        ProductsModal,
+        EditProduct
     },
     setup() {
         const trotinettes = inject('getTrotinettes') as GetTrotinettes
         const state = reactive({
             trotinettes: [] as Array<trotinette>,
-            showProductModal: false
-
+            showProductModal: false,
+            showEditProduct: false,
+            productToEdit: {} as trotinette
         })
 
         onMounted(async () => {
@@ -62,14 +66,27 @@ export default defineComponent({
         const closeModal = () => {
             state.showProductModal = false;
         };
+        const closeEditModal = () => {
+            state.showEditProduct = false
+        }
+        const editProduct = (index: number) => {
+            state.showEditProduct = true
+            state.productToEdit = state.trotinettes[index]
+            console.log(state.productToEdit)
+        }
         return {
             trotinettes,
             state,
             showModalAddProduct,
-            closeModal
+            closeModal,
+            editProduct,
+            closeEditModal
         }
-
     },
 })
 </script>
-<style scoped></style>
+<style scoped>
+.scooter-img {
+    max-width: 2rem;
+}
+</style>

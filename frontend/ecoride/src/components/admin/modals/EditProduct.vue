@@ -2,20 +2,22 @@
     <div class="product-modal" v-if="isVisible">
         <div class="container">
             <form>
-                <button class="close-button" @click="closeModal"><i class="bi bi-x-circle"></i></button>
+                <button class="close-button" @click="closeEditModal"><i class="bi bi-x-circle"></i></button>
                 <div class="row mb-3 mt-5">
                     <div class="col-md-4">
                         <label for="firstName" class="form-label">Nom</label>
-                        <input type="text" class="form-control" id="firstName" placeholder="Entrez le nom" required>
+                        <input type="text" class="form-control" id="firstName" v-model="trotinette.name"
+                            placeholder="Entrez le nom" required>
                     </div>
                     <div class="col-md-4">
                         <label for="lastName" class="form-label">Location place</label>
-                        <input type="text" class="form-control" id="lastName" placeholder="Entrez la place de location"
-                            required>
+                        <input type="text" class="form-control" id="lastName" v-model="trotinette.location_id"
+                            placeholder="Entrez la place de location" required>
                     </div>
                     <div class="col-md-4">
                         <label for="country" class="form-label">Prix</label>
-                        <input type="text" class="form-control" id="country" placeholder="Entrez le prix" required>
+                        <input type="text" class="form-control" id="country" v-model="trotinette.price"
+                            placeholder="Entrez le prix" required>
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -25,7 +27,8 @@
                     </div>
                     <div class="col-md-4">
                         <label for="lastName" class="form-label">Quantite</label>
-                        <input type="text" class="form-control" id="lastName" placeholder="Entrez la quntite" required>
+                        <input type="text" class="form-control" v-model="trotinette.qte" id="lastName"
+                            placeholder="Entrez la quntite" required>
                     </div>
 
                 </div>
@@ -36,23 +39,27 @@
 </template>
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-
+import { trotinette } from '../admin'
 export default defineComponent({
     props: {
         isVisible: {
             type: Boolean as PropType<boolean>,
             required: true,
         },
+        trotinette: {
+            type: {} as PropType<trotinette>,
+            required: true
+        }
     },
     emits: ['close'],
     setup(props, { emit }) {
 
-        const closeModal = () => {
+        const closeEditModal = () => {
             emit('close');
         };
-
+        console.log('props', props.trotinette)
         return {
-            closeModal,
+            closeEditModal,
         };
 
     },
