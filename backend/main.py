@@ -1,4 +1,5 @@
 from flask import Flask, g, jsonify, request, session, render_template
+from flask import Flask, g, jsonify, request, session, render_template
 from flask_cors import CORS
 from database.database import Database
 import hashlib
@@ -8,7 +9,9 @@ import yaml
 import string
 import secrets
 from bcrypt import hashpw, gensalt, checkpw
+from bcrypt import hashpw, gensalt, checkpw
 
+app = Flask(__name__)
 app = Flask(__name__)
 
 app.config.from_object(__name__)
@@ -23,6 +26,9 @@ app.config['MAIL_USERNAME'] = email_settings['email']['username']
 app.config['MAIL_PASSWORD'] = email_settings['email']['password']
 app.config['MAIL_USE_TLS'] = True
 mail = Mail(app)
+
+CORS(app, resources={r"/*": {"origins": "*"}})
+
 
 CORS(app, resources={r"/*": {"origins": "*"}})
 
@@ -57,6 +63,7 @@ def inscription():
     return jsonify({"message": "Registration successful!"}), 201
 
 @app.route('/login', methods=['POST'])
+@app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
     username = data.get('email')
@@ -78,11 +85,13 @@ def login():
             'fname': fname,
             'role': role,
             'id_user': user_id
+            'id_user': user_id
         }
         return jsonify({"message": "Login successful", "session": session_user}), 200
     else:
         return jsonify({"error": "Invalid password"}), 401
 
+@app.route('/logout', methods=['POST'])
 @app.route('/logout', methods=['POST'])
 def deconnexion():
     data = request.get_json()
@@ -90,6 +99,7 @@ def deconnexion():
     get_db().delete_session(id_session)
     return jsonify({'message': 'User logged out'}), 201
 
+@app.route('/resetPassword', methods=['POST'])
 @app.route('/resetPassword', methods=['POST'])
 def resetPassword():
     try:
@@ -104,6 +114,7 @@ def resetPassword():
         hashed_password = hashpw((password + salt).encode('utf-8'), gensalt()).decode('utf-8')
         db = get_db()
         db.update_user_password(user_id, salt, hashed_password)
+        db.update_user_password(user_id, salt, hashed_password)
         recipient = email
         sender = email_settings['email']['sender']
         message = Message(subject='PASSWORD RESETED',
@@ -114,6 +125,7 @@ def resetPassword():
     except Exception as e:
         return jsonify({'message':'Failed to send email'}),500
 
+@app.route('/', methods=['GET'])
 @app.route('/', methods=['GET'])
 def greetings():
     return ("hello INF6150")
