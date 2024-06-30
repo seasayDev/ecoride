@@ -5,7 +5,7 @@
                 <tr>
                     <th scope="col">ID</th>
                     <th scope="col">Name</th>
-                    <th scope="col">Location id</th>
+                    <th scope="col">Location</th>
                     <th scope="col">Price $/h</th>
                     <th scope="col">Image</th>
                     <th scope="col">Quentite</th>
@@ -16,7 +16,7 @@
                 <tr v-for="(item, index) in state.trotinettes" :key="index">
                     <th scope="row">{{ item.id_trotinette }}</th>
                     <td>{{ item.name }}</td>
-                    <td>{{ item.location_id }}</td>
+                    <td>{{ item.location.name }}</td>
                     <td>{{ item.price }}</td>
                     <td><img src="../../images/scooter1.webp" class="scooter-img" /></td>
                     <td>{{ item.qte }}</td>
@@ -38,7 +38,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, inject, onMounted, reactive, ref } from 'vue'
-import { GetTrotinettes, trotinette } from './admin'
+import { GetTrotinettes, Trotinette } from './admin'
 import ProductsModal from './modals/ProductsModal.vue';
 import EditProduct from './modals/EditProduct.vue';
 
@@ -50,10 +50,10 @@ export default defineComponent({
     setup() {
         const trotinettes = inject('getTrotinettes') as GetTrotinettes
         const state = reactive({
-            trotinettes: [] as Array<trotinette>,
+            trotinettes: [] as Array<Trotinette>,
             showProductModal: false,
             showEditProduct: false,
-            productToEdit: {} as trotinette
+            productToEdit: {} as Trotinette
         })
 
         onMounted(async () => {
@@ -72,7 +72,7 @@ export default defineComponent({
         const editProduct = (index: number) => {
             state.showEditProduct = true
             state.productToEdit = state.trotinettes[index]
-            console.log(state.productToEdit)
+            console.log('EDIT', state.productToEdit)
         }
         return {
             trotinettes,

@@ -145,14 +145,40 @@ def get_trotinettes():
             'category': row[2],
             'price': row[3],
             'available': row[4],
-            'location_id': row[5],
-            'image_id': row[6],
+            'location': {
+                'id': row[5],
+                'name': row[8],
+                'address': {
+                    'id': row[9],
+                    'address': row[10],
+                    'country': row[11],
+                    'city': row[12],
+                    'province': row[13],
+                    'postal_code': row[14]
+                }
+            },
+            'image': {
+                'id': row[6],
+                'data': row[15]
+            },
             'qte': row[7]
         }
         trotinettes.append(trotinette)
 
     return jsonify(trotinettes)
 
+@app.route('/getLocations',methods=['GET'])
+def get_locations():
+    data = get_db().get_all_locations()
+    locations = []
+    for row in data:
+        location={
+          'id_location':row[0],
+          'name':row[1],
+           'address_id':row[2] 
+        }
+        locations.append(location)
+    return jsonify(locations)
 
 if __name__=="__main__":
     app.run(debug=True)

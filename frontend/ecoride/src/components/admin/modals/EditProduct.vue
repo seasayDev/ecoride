@@ -1,22 +1,22 @@
 <template>
     <div class="product-modal" v-if="isVisible">
         <div class="container">
-            <form>
+            <form @submit.prevent="editProduct">
                 <button class="close-button" @click="closeEditModal"><i class="bi bi-x-circle"></i></button>
                 <div class="row mb-3 mt-5">
                     <div class="col-md-4">
                         <label for="firstName" class="form-label">Nom</label>
-                        <input type="text" class="form-control" id="firstName" v-model="trotinette.name"
+                        <input type="text" class="form-control" id="firstName" v-model="state.trotinette.name"
                             placeholder="Entrez le nom" required>
                     </div>
                     <div class="col-md-4">
                         <label for="lastName" class="form-label">Location place</label>
-                        <input type="text" class="form-control" id="lastName" v-model="trotinette.location_id"
+                        <input type="text" class="form-control" id="lastName" v-model="state.trotinette.location.name"
                             placeholder="Entrez la place de location" required>
                     </div>
                     <div class="col-md-4">
                         <label for="country" class="form-label">Prix</label>
-                        <input type="text" class="form-control" id="country" v-model="trotinette.price"
+                        <input type="text" class="form-control" id="country" v-model="state.trotinette.price"
                             placeholder="Entrez le prix" required>
                     </div>
                 </div>
@@ -27,19 +27,19 @@
                     </div>
                     <div class="col-md-4">
                         <label for="lastName" class="form-label">Quantite</label>
-                        <input type="text" class="form-control" v-model="trotinette.qte" id="lastName"
+                        <input type="text" class="form-control" v-model="state.trotinette.qte" id="lastName"
                             placeholder="Entrez la quntite" required>
                     </div>
 
                 </div>
-                <button type="button" class="btn btn-primary mt-5">Submit</button>
+                <button type="submit" class="btn btn-primary mt-5">Submit</button>
             </form>
         </div>
     </div>
 </template>
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
-import { trotinette } from '../admin'
+import { defineComponent, onMounted, PropType, reactive, watch } from 'vue'
+import { Trotinette } from '../admin'
 export default defineComponent({
     props: {
         isVisible: {
@@ -47,20 +47,35 @@ export default defineComponent({
             required: true,
         },
         trotinette: {
-            type: {} as PropType<trotinette>,
+            type: {} as PropType<Trotinette>,
             required: true
         }
     },
     emits: ['close'],
     setup(props, { emit }) {
 
+        const state = reactive({
+            trotinette: {} as Trotinette
+        })
+
+        watch(() => props.trotinette, (newValue) => {
+            state.trotinette = newValue
+        }, { immediate: true })
+
         const closeEditModal = () => {
             emit('close');
         };
-        console.log('props', props.trotinette)
+
+        const editProduct = () => {
+            console.log('props', state.trotinette)
+
+        }
         return {
             closeEditModal,
+            state,
+            editProduct
         };
+
 
     },
 })

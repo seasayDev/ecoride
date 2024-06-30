@@ -247,14 +247,33 @@ class Database:
         trottinettes = cursor.fetchone()
         return trottinettes
 
+    # def get_all_trottinettes(self):
+    #     cursor = self.get_connection().cursor()
+    #     cursor.execute(("select * from trotinette"))
+    #     trottinettes = cursor.fetchall()
+    #     if trottinettes is None:
+    #         return None
+    #     else:
+    #         return trottinettes
+        
     def get_all_trottinettes(self):
-        cursor = self.get_connection().cursor()
-        cursor.execute(("select * from trotinette"))
-        trottinettes = cursor.fetchall()
-        if trottinettes is None:
-            return None
-        else:
-            return trottinettes
+        query = """
+        SELECT t.id_trotinette, t.name, t.category, t.price, t.available, t.location_id, t.image_id, t.qte,
+               l.name as location_name, l.address_id,
+               a.address, a.country, a.city, a.province, a.postal_code,
+               p.data as picture_data
+        FROM trotinette t
+        LEFT JOIN locations l ON t.location_id = l.id_location
+        LEFT JOIN addresses a ON l.address_id = a.id_address
+        LEFT JOIN pictures p ON t.image_id = p.id_pictures
+        """
+
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(query)
+            result = cursor.fetchall()
+
+        return result
 
     def delete_trotinette(self, id_trotinette):
         cursor = self.get_connection()
@@ -456,3 +475,10 @@ class Database:
         cursor = connection.cursor()
         cursor.execute("DELETE FROM support_requests WHERE id = ?", (request_id,))
         connection.commit()
+
+    def get_all_locations(self):
+        cursor = self.get_connection().cursor()
+        cursor.execute("SELECT * FROM locations")
+        locations = cursor.fetchall()
+        return locations
+

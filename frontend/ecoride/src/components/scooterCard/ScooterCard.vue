@@ -2,17 +2,24 @@
     <div class="card" style="width: 18rem;">
         <img class="card-img-top" src="../../images/scooter1.webp" alt="scooter 1">
         <div class="card-body">
-            <h5 class="card-title">Scooter 1</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk </p>
+            <h5 class="card-title">{{ scooter.name }}</h5>
+            <p class="card-text">{{ scooter.location.name }} </p>
             <a href="#" class="btn btn-primary">Reserver</a>
         </div>
     </div>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, PropType } from 'vue'
+import { Trotinette } from './scooterCard';
 
 export default defineComponent({
-    setup() {
+    props: {
+        scooter: {
+            type: {} as PropType<Trotinette>,
+            required: true
+        }
+    },
+    setup(props, { emit }) {
 
     },
 })
