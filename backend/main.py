@@ -1,4 +1,4 @@
-from flask import Flask ,g,jsonify,request,session
+from flask import Flask ,g,jsonify,request,session,render_template
 from flask_cors import CORS
 from database.database import Database
 import hashlib
@@ -15,6 +15,15 @@ app =Flask(__name__)
 app.config.from_object(__name__)
 app.secret_key = 'Xp2s5v8y/B?D(G+KbPeShVmYq3t6w9z$'
 
+with open('email.yaml') as f:
+    email_settings = yaml.safe_load(f)
+
+app.config['MAIL_SERVER'] = email_settings['email']['host']
+app.config['MAIL_PORT'] = email_settings['email']['port']
+app.config['MAIL_USERNAME'] = email_settings['email']['username']
+app.config['MAIL_PASSWORD'] = email_settings['email']['password']
+app.config['MAIL_USE_TLS'] = True
+mail = Mail(app)
 CORS(app,resources={r"/*":{'origins':"*"}})
 # CORS(app,resources={r"/*":{'origins':'http://localhost:8080',"allow_headers":"Acces-Control-Allow-Origins"}})
 def get_db():
@@ -69,6 +78,7 @@ def login():
             'email': email,
             'fname': fname,
             'role': role,
+            'id_user':user_id
         }
         return jsonify({"message": "Login successful", "session": session_user}), 200
     else:
@@ -83,37 +93,38 @@ def deconnexion():
 
 @app.route('/resetPassword',methods=['POST'])
 def resetPassword():
-    data = request.get_json()
-    email = data.get('email')
-    user_id = get_db().get_user_id_by_email(email)
-    if not user_id:
-        return jsonify({'error':'user does not exist'}),400
-    alphabet = string.ascii_letters + string.digits + string.punctuation
-    password = ''.join(secrets.choice(alphabet) for i in range(10))
-    salt = uuid.uuid4().hex
-    hashed_password = hashpw((password + salt).encode('utf-8'), gensalt()).decode('utf-8')
-    db = get_db()
-    db.update_user_password(user_id,salt,hashed_password)
-    # TODO add email html page 
-    return jsonify({'message':"email reset sended"}), 201
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        user_id = get_db().get_user_id_by_email(email)
+        if not user_id:
+            return jsonify({'error':'user does not exist'}),400
+        alphabet = string.ascii_letters + string.digits + string.punctuation
+        password = ''.join(secrets.choice(alphabet) for i in range(10))
+        salt = uuid.uuid4().hex
+        hashed_password = hashpw((password + salt).encode('utf-8'), gensalt()).decode('utf-8')
+        db = get_db()
+        db.update_user_password(user_id,salt,hashed_password)
+        recipient = email
+        sender = email_settings['email']['sender']
+        message = Message(subject='PASSWORD RESETED',
+                          sender=sender, recipients=[recipient])
+        message.html = render_template('reset_password_confirmation.html', password=password)
+        mail.send(message)
+        return jsonify({'message':"email reset sended"}), 201
+    except Exception as e:
+        return jsonify({'message':'Failed to send email'}),500
+
 
 @app.route('/',methods=['GET'])
 def greetings():
     return ("hello INF6150")
 
 
-@app.route('/support', methods=['POST'])  
-def submit_support_request():  
-    data = request.json  
-    user_id = data.get('user_id')  
-    support_option = data.get('support_option')  
-    message = data.get('message')  
+@app.route('/support', methods=['GET'])
+def support_page():
+    return render_template('support.html')  # Ajouté pour servir une page HTML pour le support
 
-    if not user_id or not support_option or not message:  
-        return jsonify({'error': 'Missing data'}), 400  
-
-    support_request_id = get_db().create_support_request(user_id, support_option, message) 
-    return jsonify({'message': 'Support request submitted successfully', 'request_id': support_request_id}), 200 
 
 
 if __name__=="__main__":

@@ -13,13 +13,19 @@
             <li>
                 <router-link v-if="userStore.user" to="/" @click.prevent="deconnexion">Deconnexion</router-link>
             </li>
+            <li>
+                <router-link v-if="userStore.user" to="/admin">Admin</router-link>
+            </li>
         </ul>
+
+        <span v-if="userStore.user" class="username">{{ getUserName }}</span>
+
     </nav>
 </template>
   
 <script lang="ts">
 import { useRouter } from "vue-router";
-import { defineComponent, onMounted, reactive, watch, inject } from 'vue';
+import { defineComponent, onMounted, reactive, watch, inject, computed } from 'vue';
 import { userStore, setUser, getUserFromStorage } from "@/components/helpers/userSession";
 import { LoginUser } from '../login';
 export default defineComponent({
@@ -29,10 +35,13 @@ export default defineComponent({
         const router = useRouter();
 
         const state = reactive({
-            user: {} as Object | null
+            user: {} as Object | null,
+            userName: ''
         })
 
         getUserFromStorage();
+
+        const getUserName = computed(() => { return userStore.user?.session.fname })
 
         const deconnexion = () => {
             loginUser.deconnexion(userStore.user?.session.id)
@@ -40,12 +49,15 @@ export default defineComponent({
             router.push("/")
         }
 
+
         return {
             state,
             deconnexion,
             router,
             userStore,
-            loginUser
+            loginUser,
+            getUserName,
+
         }
     }
 });
@@ -74,6 +86,13 @@ a {
 
 a:hover {
     text-decoration: underline;
+}
+
+.username {
+    position: absolute;
+    color: white;
+    right: 33px;
+    top: 16px;
 }
 </style>
   
