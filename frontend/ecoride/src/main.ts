@@ -14,11 +14,15 @@ import { LoginUser } from './components/login/login'
 import { ResetPassword } from '@/components/resetPassword/resetPassword'
 import { GetTrotinettes } from './components/admin/admin'
 
+import { SupportService } from '@/components/support/support'
+
 const app = createApp(App)
-const backURL = 'http://127.0.0.1:5000' // back end url to send  api requests
+const backURL = 'http://127.0.0.1:5000' // back end url to send api requests
+
 app.use(router)
 app.provide('regitsre', new RegisterUser(backURL + '/register'))
 app.provide('loginUser', new LoginUser(backURL))
 app.provide('resetPassword', new ResetPassword(backURL))
 app.provide('getTrotinettes', new GetTrotinettes(backURL))
+app.provide('supportService', new SupportService(backURL + '/support'))
 app.mount('#app')

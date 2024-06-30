@@ -2,7 +2,6 @@
   <div class="container mt-5">
     <h1>Comment voulez vous nous joindre ?</h1>
 
-    
     <div class="mb-3">
       <h2>Contactez-nous par Téléphone</h2>
       <p>Vous pouvez nous contacter à nos heures d'ouvertures du lundi au vendredi de 8h à 18h aux numéros de téléphone suivants :</p>
@@ -12,7 +11,6 @@
       </ul>
     </div>
 
-    
     <div class="mb-3">
       <h2>Contactez-nous par Email</h2>
       <form @submit.prevent="submitEmail">
@@ -29,13 +27,11 @@
       <p v-if="emailConfirmation" class="alert alert-success mt-3">{{ emailConfirmation }}</p>
     </div>
 
-    <!-- Section Chat en direct -->
     <div class="mb-3">
       <h2>Contactez-nous par Chat en direct</h2>
       <button @click="openChat" class="btn btn-primary">Chat en direct</button>
     </div>
 
-    <!-- Chat Box -->
     <div v-if="showChat" class="chat-box">
       <div class="chat-header">
         <h5>Live-Chat</h5>
@@ -53,7 +49,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, Ref } from 'vue';
+import { defineComponent, ref, inject, Ref } from 'vue';
+import { SupportService, SupportRequest } from './support';
 
 export default defineComponent({
   name: 'Support',
@@ -65,18 +62,39 @@ export default defineComponent({
     const chatMessages: Ref<string[]> = ref([]);
     const newMessage: Ref<string> = ref('');
 
-    const submitEmail = () => {
-      console.log('submitEmail called');  
-      emailConfirmation.value = "Nous avons bien reçu votre demande.";
+    const supportService = inject('supportService') as SupportService;
+
+    const submitEmail = async () => {
+      console.log('submitEmail called');
+      if (supportService) {
+        try {
+          const supportRequest: SupportRequest = {
+            user_id: 1, //id user
+            support_option: 'email',
+            message: `Email: ${email.value}, Message: ${message.value}`
+          };
+          await supportService.submitRequest(supportRequest);
+          emailConfirmation.value = "Nous avons bien reçu votre demande.";
+          console.log('Email Confirmation:', emailConfirmation.value);
+        } catch (error) {
+          console.error('Erreur lors de l\'envoi de la demande de support', error);
+        }
+      } else {
+        console.error('SupportService non fourni');
+      }
       email.value = '';
       message.value = '';
-      console.log('Email Confirmation:', emailConfirmation.value);  
+      console.log('State after submission:', {
+        email: email.value,
+        message: message.value,
+        emailConfirmation: emailConfirmation.value,
+      });
     };
 
     const openChat = () => {
       console.log('openChat called');
       showChat.value = true;
-      console.log('Show Chat:', showChat.value); 
+      console.log('Show Chat:', showChat.value);
     };
 
     const closeChat = () => {
