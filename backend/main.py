@@ -8,6 +8,7 @@ import yaml
 import string
 import secrets
 from bcrypt import hashpw, gensalt, checkpw
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -179,6 +180,42 @@ def get_locations():
         }
         locations.append(location)
     return jsonify(locations)
+
+@app.route('/reserveTrotinette', methods=['POST'])
+def reserve_trotinette():
+    data = request.get_json()
+    trotinette_id = data.get('trotinette_id')
+    user_id = data.get('user_id')
+    start_date = datetime.strptime(data.get('start_date'), '%Y-%m-%d %H:%M')
+    end_date = datetime.strptime(data.get('end_date'), '%Y-%m-%d %H:%M')
+    pick_up_address = data.get('pick_up_address')
+    drop_off_address = data.get('drop_off_address')
+    options = data.get('options', '')
+
+    db = get_db()
+    trotinette = db.get_trotinette_by_id(trotinette_id)
+
+    if not trotinette or trotinette['qte'] <= 0:
+        return jsonify({'error': 'Trotinette not available'}), 400
+
+    total_cost = (end_date - start_date).seconds / 3600 * trotinette['price']
+    db.create_reservation(start_date, end_date, pick_up_address, drop_off_address, total_cost, trotinette_id, user_id, options)
+    db.update_trotinette_quantity(trotinette_id, trotinette['qte'] - 1)
+
+    user = db.get_user_by_id(user_id)
+    recipient = user['email']
+    sender = email_settings['email']['sender']
+    message = Message(subject='Reservation Confirmation',
+                      sender=sender, recipients=[recipient])
+    message.html = render_template('reservation_confirmation.html', 
+                                   start_date=start_date, 
+                                   end_date=end_date, 
+                                   total_cost=total_cost,
+                                   pick_up_address=pick_up_address,
+                                   drop_off_address=drop_off_address)
+    mail.send(message)
+
+    return jsonify({'message': 'Reservation successful'}), 201
 
 if __name__ == "__main__":
     app.run(debug=True)

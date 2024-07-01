@@ -13,7 +13,7 @@ class Database:
     def disconnect(self):
         if self.connection is not None:
             self.connection.close()
-            self.connection =None
+            self.connection = None
 
     def create_user(self, first_name, last_name, email, date_of_birth,
                     phone, address, country, city, province, postal_code, salt, hash):
@@ -37,7 +37,7 @@ class Database:
         else:
             return user[0], user[1], user[2], user[3], user[4], user[5], user[6]
 
-    def get_user_by_email(self,email):
+    def get_user_by_email(self, email):
         cursor = self.get_connection().cursor()
         cursor.execute(("select email from users where email=?"),
                        (email,))
@@ -46,7 +46,8 @@ class Database:
             return None
         else:
             return user[0]
-    def get_user_id_by_email(self,email):
+
+    def get_user_id_by_email(self, email):
         cursor = self.get_connection().cursor()
         cursor.execute(("select id_user from users where email=?"),
                        (email,))
@@ -56,18 +57,15 @@ class Database:
         else:
             return user[0]
 
-
     def save_session(self, id_session, email, name, role):
         connection = self.get_connection()
         cursor = connection.cursor()
-        # Insert the session data into the database
-        cursor.execute("INSERT INTO sessions(id_session, email, name, user_type) VALUES (?, ?, ?, ?)", 
+        cursor.execute("INSERT INTO sessions(id_session, email, name, user_type) VALUES (?, ?, ?, ?)",
                        (id_session, email, name, role))
         connection.commit()
         cursor.execute("SELECT id_session, email, name, user_type FROM sessions WHERE id_session = ?", (id_session,))
         userSession = cursor.fetchone()
         return userSession
-    
 
     def delete_session(self, id_session):
         connection = self.get_connection()
@@ -134,7 +132,7 @@ class Database:
                        "(SELECT id_trotinette FROM trotinette WHERE category = ?) " +
                        "WHERE id_reservation = ?", (start_date, end_date, total_cost, category, id_reservation))
         cursor.commit()
-    
+
     def update_reservation_dropout(self, id_reservation, end_date):
         cursor = self.get_connection()
         cursor.execute("UPDATE reservations " +
@@ -177,10 +175,10 @@ class Database:
             return None
         else:
             return userAdd
-        
+
     def get_all_clients(self):
         cursor = self.get_connection().cursor()
-        cursor.execute(("SELECT * FROM users WHERE user_type=?"),("user",))
+        cursor.execute(("SELECT * FROM users WHERE user_type=?"), ("user",))
         users = cursor.fetchall()
         return users
 
@@ -247,15 +245,6 @@ class Database:
         trottinettes = cursor.fetchone()
         return trottinettes
 
-    # def get_all_trottinettes(self):
-    #     cursor = self.get_connection().cursor()
-    #     cursor.execute(("select * from trotinette"))
-    #     trottinettes = cursor.fetchall()
-    #     if trottinettes is None:
-    #         return None
-    #     else:
-    #         return trottinettes
-        
     def get_all_trottinettes(self):
         query = """
         SELECT t.id_trotinette, t.name, t.category, t.price, t.available, t.location_id, t.image_id, t.qte,
@@ -334,7 +323,7 @@ class Database:
                            pic_id, sqlite3.Binary(file_data.read())])
         connection.commit()
 
-    def get_picture_data(self,picture_id):
+    def get_picture_data(self, picture_id):
         cursor = self.get_connection().cursor()
         cursor.execute("SELECT * FROM pictures WHERE id_pictures = ?", (picture_id,))
         row = cursor.fetchone()
@@ -349,7 +338,7 @@ class Database:
         rabais = cursor.fetchall()
         return rabais
 
-    def get_pub_id(self,id):
+    def get_pub_id(self, id):
         cursor = self.get_connection().cursor()
         cursor.execute("SELECT * FROM rabais where id_rabais = ?", (id,))
         rabais = cursor.fetchall()
@@ -374,7 +363,7 @@ class Database:
                        (name, valeur, code, date_depart, date_fin, pic_id, id_rabais))
         cursor.commit()
 
-    def update_pub_active(self, bool,id_rabais):
+    def update_pub_active(self, bool, id_rabais):
         cursor = self.get_connection()
         cursor.execute("UPDATE rabais set active = ? where id_rabais =?",
                        (bool, id_rabais))
@@ -444,7 +433,6 @@ class Database:
         cursor.execute('SELECT * FROM trotinette where id_trotinette=? ', (id,))
         trotinette = cursor.fetchone()
         return trotinette
-    
 
     def create_support_request(self, user_id, support_option, message):
         connection = self.get_connection()
@@ -482,3 +470,31 @@ class Database:
         locations = cursor.fetchall()
         return locations
 
+    # Method to get trotinette by ID
+    def get_trotinette_by_id(self, id_trotinette):
+        cursor = self.get_connection().cursor()
+        cursor.execute("SELECT * FROM trotinette WHERE id_trotinette=?", (id_trotinette,))
+        return cursor.fetchone()
+
+    # Method to create a reservation
+    def create_reservation(self, start_date, end_date, pick_up_address, drop_off_address, total_cost, trotinette_id, user_id, options):
+        connection = self.get_connection()
+        cursor = connection.cursor()
+        cursor.execute(
+            "INSERT INTO reservations (start_date, end_date, pick_up_address, drop_off_address, total_cost, trotinette_id, user_id, options) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            (start_date, end_date, pick_up_address, drop_off_address, total_cost, trotinette_id, user_id, options)
+        )
+        connection.commit()
+
+    # Method to update trotinette quantity
+    def update_trotinette_quantity(self, id_trotinette, new_quantity):
+        connection = self.get_connection()
+        cursor = connection.cursor()
+        cursor.execute("UPDATE trotinette SET qte=? WHERE id_trotinette=?", (new_quantity, id_trotinette))
+        connection.commit()
+
+    # Method to get user by ID
+    def get_user_by_id(self, user_id):
+        cursor = self.get_connection().cursor()
+        cursor.execute("SELECT * FROM users WHERE id_user=?", (user_id,))
+        return cursor.fetchone()
