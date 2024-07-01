@@ -4,7 +4,7 @@
         <div class="card-body">
             <h5 class="card-title">{{ scooter.name }}</h5>
             <p class="card-text">{{ scooter.location.name }} </p>
-            <a href="#" class="btn btn-primary">Reserver</a>
+            <button @click="reserve" class="btn btn-primary">Reserver</button>
         </div>
     </div>
 </template>
@@ -19,8 +19,15 @@ export default defineComponent({
             required: true
         }
     },
+    emits: ['reserve'],
     setup(props, { emit }) {
+        const reserve = () => {
+            emit('reserve', props.scooter);
+        };
 
+        return {
+            reserve
+        };
     },
 })
 </script>
