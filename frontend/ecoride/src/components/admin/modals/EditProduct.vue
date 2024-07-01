@@ -10,9 +10,12 @@
                             placeholder="Entrez le nom" required>
                     </div>
                     <div class="col-md-4">
-                        <label for="lastName" class="form-label">Location place</label>
-                        <input type="text" class="form-control" id="lastName" v-model="state.trotinette.location.name"
-                            placeholder="Entrez la place de location" required>
+                        <label for="location" class="form-label">Location place</label>
+                        <select class="form-select" id="location" v-model="state.trotinette.location.name" required>
+                            <option v-for="location in locations" :key="location.id" :value="location.name">
+                                {{ location.name }}
+                            </option>
+                        </select>
                     </div>
                     <div class="col-md-4">
                         <label for="country" class="form-label">Prix</label>
@@ -23,7 +26,7 @@
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <label for="firstName" class="form-label">Image</label>
-                        <input type="file" class="form-control" id="firstName" @change="onFileChange" required>
+                        <input type="file" class="form-control" id="firstName" @change="onFileChange">
                     </div>
                     <div class="col-md-4">
                         <label for="lastName" class="form-label">Quantite</label>
@@ -43,8 +46,8 @@
     </div>
 </template>
 <script lang="ts">
-import { defineComponent, onMounted, PropType, reactive, watch } from 'vue'
-import { Trotinette } from '../admin'
+import { defineComponent, onMounted, PropType, reactive, watch, inject } from 'vue'
+import { Trotinette, Location, Newscooter, GetTrotinettes } from '../admin'
 export default defineComponent({
     props: {
         isVisible: {
@@ -54,17 +57,26 @@ export default defineComponent({
         trotinette: {
             type: {} as PropType<Trotinette>,
             required: true
+        },
+        locations: {
+            type: {} as PropType<Array<Location>>,
+            required: true
         }
     },
     emits: ['close', 'update'],
     setup(props, { emit }) {
-
+        const trotinettes = inject('getTrotinettes') as GetTrotinettes
         const state = reactive({
-            trotinette: { ...props.trotinette }
+            trotinette: { ...props.trotinette },
+            locations: { ...props.locations },
         })
 
         watch(() => props.trotinette, (newValue) => {
             state.trotinette = { ...newValue }
+
+        }, { immediate: true })
+        watch(() => props.locations, (newValue) => {
+            state.locations = { ...newValue }
         }, { immediate: true })
 
         const closeEditModal = () => {
@@ -84,15 +96,25 @@ export default defineComponent({
                 reader.onload = () => {
                     state.trotinette.image = {
                         id: state.trotinette.image?.id || null,
-                        data: reader.result as string
+                        data: reader.result.split(',')[1] as string
                     };
                 };
                 reader.readAsDataURL(file);
             }
         };
 
-        const editProduct = () => {
-            console.log('props', state.trotinette)
+        const editProduct = async () => {
+            const result = {
+                id_trotinette: state.trotinette.id_trotinette,
+                name: state.trotinette.name,
+                category: state.trotinette.category,
+                price: state.trotinette.price,
+                available: state.trotinette.available,
+                location: { ...state.trotinette.location },
+                image: { ...state.trotinette.image },
+                qte: state.trotinette.qte,
+            }
+            await trotinettes.updateScooter(result)
             emit('update', state.trotinette);
             closeEditModal();
 
@@ -101,7 +123,8 @@ export default defineComponent({
             closeEditModal,
             state,
             editProduct,
-            onFileChange
+            onFileChange,
+            trotinettes
         };
 
 

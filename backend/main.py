@@ -8,6 +8,7 @@ import yaml
 import string
 import secrets
 from bcrypt import hashpw, gensalt,checkpw
+import base64
 
 
 app =Flask(__name__)
@@ -131,6 +132,7 @@ def get_trotinettes():
     data = get_db().get_all_trottinettes()
     trotinettes = []
     for row in data:
+        image_data = base64.b64encode(row[15]).decode('utf-8') if row[15] is not None else None
         trotinette = {
             'id_trotinette': row[0],
             'name': row[1],
@@ -140,18 +142,19 @@ def get_trotinettes():
             'location': {
                 'id': row[5],
                 'name': row[8],
-                'address': {
+                'id_address':row[9]
+            },
+            'address': {
                     'id': row[9],
                     'address': row[10],
                     'country': row[11],
                     'city': row[12],
                     'province': row[13],
                     'postal_code': row[14]
-                }
-            },
+                },
             'image': {
                 'id': row[6],
-                'data': row[15]
+                'data': image_data
             },
             'qte': row[7]
         }
@@ -171,6 +174,58 @@ def get_locations():
         }
         locations.append(location)
     return jsonify(locations)
+
+@app.route('/createScooter',methods=['POST'])
+def create_scooter():
+    try:
+        data = request.get_json()
+        name = data.get('name')
+        category = data.get('category')
+        price = data.get('price')
+        available = data.get('available', False)  # Default to False if not provided
+        location_id = data.get('location', {}).get('id_location')
+        image_data = data.get('image', {}).get('data')
+        qte = data.get('qte')
+        print(name,category,price,location_id,qte,image_data)
+        if not (name and category and price and location_id and qte is not None):
+            return jsonify({'error': 'Missing required fields'}), 400
+        image_id = str(uuid.uuid4().hex)
+        file_data = base64.b64decode(image_data) if image_data else None
+        get_db().create_trotinette(name, category, price, available, location_id, image_id, qte, file_data)
+        return jsonify({'message':"sccoter added"}), 201
+    except Exception as e:
+        return jsonify({'error': 'An error occurred while processing your request'}), 500
+
+@app.route('/updateScooter',methods=['PUT'])
+def update_scooter():
+    try:
+        data = request.get_json()
+        id_trotinette = data.get('id_trotinette')
+        name = data.get('name')
+        category = data.get('category')
+        price = data.get('price')
+        available = data.get('available', False)  # Default to False if not provided
+        location_id = data.get('location', {}).get('id')
+        image_data = data.get('image', {}).get('data')
+        image_id = data.get('image', {}).get('id')
+        qte = data.get('qte')
+
+        # Decode the base64 image data if it exists
+        file_data = base64.b64decode(image_data) if image_data else None
+        if not image_id:
+            image_id = str(uuid.uuid4().hex)
+            get_db().create_picture(image_id,file_data)
+        # Print for debugging
+        print(id_trotinette, name, category, price, available, location_id, image_id, qte)
+
+        # Call the update function
+        get_db().update_trotinette(id_trotinette, category, name, price, qte, location_id, file_data, image_id, available)
+        return jsonify({'message': 'Scooter updated'}), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({'error': 'An error occurred while processing your request'}), 500
+
+
 
 if __name__=="__main__":
     app.run(debug=True)
