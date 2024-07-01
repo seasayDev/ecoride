@@ -22,8 +22,14 @@
                     <td><img :src="getImageSrc(item.image.data)" class="scooter-img" /></td>
                     <td>{{ item.category }}</td>
                     <td>{{ item.qte }}</td>
-                    <td><button class="btn btn-info" @click="editProduct(index)"><i
-                                class="bi bi-pencil-square"></i></button></td>
+                    <td>
+                        <div>
+                            <button class="btn btn-info" @click="editProduct(index)"><i
+                                    class="bi bi-pencil-square"></i></button>
+                            <button class="btn btn-danger ms-2" @click="deleteProduct(index)"><i
+                                    class="bi bi-trash"></i></button>
+                        </div>
+                    </td>
 
                 </tr>
 
@@ -37,18 +43,22 @@
     </div>
     <ProductsModal :isVisible="state.showProductModal" @close="closeModal" :locations="state.locations" />
     <EditProduct :isVisible="state.showEditProduct" @close="closeEditModal" :trotinette="state.productToEdit"
-        :locations="state.locations" />
+        :locations="state.locations" @update="updateProductsTable" />
+    <DeleteProduct :isVisible="state.isDeleteModalVisible" @close="hideDeleteModal" :trotinette="state.scooterTodelete">
+    </DeleteProduct>
 </template>
 <script lang="ts">
 import { defineComponent, inject, onMounted, reactive, ref } from 'vue'
 import { GetTrotinettes, Trotinette, Location } from './admin'
 import ProductsModal from './modals/ProductsModal.vue';
 import EditProduct from './modals/EditProduct.vue';
+import DeleteProduct from './modals/DeleteProduct.vue';
 
 export default defineComponent({
     components: {
         ProductsModal,
-        EditProduct
+        EditProduct,
+        DeleteProduct
     },
     setup() {
         const trotinettes = inject('getTrotinettes') as GetTrotinettes
@@ -56,15 +66,16 @@ export default defineComponent({
             trotinettes: [] as Array<Trotinette>,
             showProductModal: false,
             showEditProduct: false,
+            isDeleteModalVisible: false,
             productToEdit: {} as Trotinette,
-            locations: [] as Array<Location>
+            locations: [] as Array<Location>,
+            scooterTodelete: {} as Trotinette
+
         })
 
         onMounted(async () => {
             state.trotinettes = await trotinettes.getTrotinettes();
-            console.log('scooter', state.trotinettes)
             state.locations = await trotinettes.getLocations()
-            console.log(state.locations)
         })
         const showModalAddProduct = () => {
             state.showProductModal = true
@@ -78,11 +89,22 @@ export default defineComponent({
         const editProduct = (index: number) => {
             state.showEditProduct = true
             state.productToEdit = state.trotinettes[index]
-            console.log('EDIT', state.productToEdit)
+        }
+        const deleteProduct = (index: number) => {
+            state.scooterTodelete = state.trotinettes[index]
+            state.isDeleteModalVisible = true
+        }
+        const hideDeleteModal = () => {
+            state.isDeleteModalVisible = false;
         }
         const getImageSrc = (imageData: string) => {
             return `data:image/webp;base64,${imageData}`;
         };
+
+        const updateProductsTable = async () => {
+            state.trotinettes = await trotinettes.getTrotinettes();
+            state.locations = await trotinettes.getLocations()
+        }
         return {
             trotinettes,
             state,
@@ -90,7 +112,10 @@ export default defineComponent({
             closeModal,
             editProduct,
             closeEditModal,
-            getImageSrc
+            getImageSrc,
+            deleteProduct,
+            updateProductsTable,
+            hideDeleteModal
         }
     },
 })

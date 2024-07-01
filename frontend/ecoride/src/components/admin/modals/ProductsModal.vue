@@ -57,7 +57,7 @@ export default defineComponent({
             required: true,
         },
         locations: {
-            type: [] as PropType<Array<Location>>,
+            type: Array as PropType<Array<Location>>,
             required: true
         }
     },
@@ -74,7 +74,9 @@ export default defineComponent({
             state.locations = newValue
         }, { immediate: true })
 
-        const closeModal = () => {
+        const closeModal = (event: Event) => {
+            event.preventDefault();
+            event.stopPropagation();
             emit('close');
         };
         const onFileChange = (event: Event) => {

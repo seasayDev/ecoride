@@ -79,7 +79,9 @@ export default defineComponent({
             state.locations = { ...newValue }
         }, { immediate: true })
 
-        const closeEditModal = () => {
+        const closeEditModal = (event: Event) => {
+            event.preventDefault();
+            event.stopPropagation();
             emit('close');
         };
         const onFileChange = (event: Event) => {
