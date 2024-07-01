@@ -466,14 +466,14 @@ class Database:
 
 
 
-    def get_user_info(self, email):
+    def get_user_info(self, id_user):
         cursor = self.get_connection().cursor()
         cursor.execute(("SELECT users.first_name, users.last_name, users.email, users.date_of_birth, users.phone, " +
                         "addresses.address, addresses.country, addresses.city, addresses.province, addresses.postal_code " +
                         "FROM users " +
                         "JOIN addresses ON users.address_id = addresses.id_address " +
-                        "WHERE users.email = ?"),
-                       (email,))
+                        "WHERE users.id_user = ?"),
+                       (id_user,))
         user = cursor.fetchone()
         if user is None:
             return None
@@ -490,3 +490,14 @@ class Database:
                 'province': user[8],
                 'postalCode': user[9]
             }
+
+
+
+    def get_user_address_id(self, email):
+        cursor = self.get_connection().cursor()
+        cursor.execute("SELECT address_id FROM users WHERE email = ?", (email,))
+        address_id = cursor.fetchone()
+        if address_id is None:
+            return None
+        return address_id[0]
+

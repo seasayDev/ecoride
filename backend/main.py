@@ -72,6 +72,7 @@ def login():
             'email': email,
             'fname': fname,
             'role': role,
+            'id_user': user_id
         }
         return jsonify({"message": "Login successful", "session": session_user}), 200
     else:
@@ -122,21 +123,24 @@ def submit_support_request():
 
 @app.route('/profil', methods=['GET'])
 def get_user():
-    email = request.args.get('email')
+    id_user = request.args.get('id_user')
     
-    if not email:
+    if not id_user:
         return jsonify({"error": "User not logged in"}), 401
 
-    
 
-    profil = get_db().get_user_info(email)
+    try:
+        id_user = int(id_user)
+    except ValueError:
+        return jsonify({"error": "Invalid user ID"}), 400
+
+    profil = get_db().get_user_info(id_user)
     if not profil:
         return jsonify({"error": "User not found"}), 404
 
-    print(profil)
+    #print(profil)
     return jsonify(profil), 200
     
-
 
 
 if __name__=="__main__":
