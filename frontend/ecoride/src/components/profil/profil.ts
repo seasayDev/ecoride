@@ -20,11 +20,11 @@ export class ProfileService {
     this.url = url;
   }
 
-  public async getUserProfile(email: string): Promise<UserProfile> {
+  public async getUserProfile(id_user: string): Promise<UserProfile> {
     try {
       const response = await axios.get(this.url, {
         params: {
-          email: email
+          id_user: id_user
         },
         withCredentials: true
       });
