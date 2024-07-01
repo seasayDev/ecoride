@@ -210,17 +210,33 @@ class Database:
                 (dateDepar, dateRetour, locaDepart, locRetour, totalCost, userid, idTrotinette, option))
             connection.commit()
 
-    def create_trotinette(self, categorie, modele, prix, qte, image_id):
+    # def create_trotinette(self, categorie, modele, prix, qte, image_id):
+    #     connection = self.get_connection()
+    #     cursor = connection.cursor()
+    #     cursor.execute("SELECT * FROM trotinette WHERE category = ? AND name = ?",
+    #                    (categorie, modele))
+    #     existing_trotinette = cursor.fetchone()
+    #     if existing_trotinette is None:
+    #         cursor.execute(
+    #             "INSERT INTO trotinette (category,name,price,qte,image_id) VALUES (?,?,?,?,?)",
+    #             (categorie.lower(), modele.lower(), prix, qte, image_id))
+    #         connection.commit()
+    def create_trotinette(self,name, category, price, available, location_id, image_id, qte, file_data):
         connection = self.get_connection()
         cursor = connection.cursor()
-        cursor.execute("SELECT * FROM trotinette WHERE category = ? AND name = ?",
-                       (categorie, modele))
-        existing_trotinette = cursor.fetchone()
-        if existing_trotinette is None:
-            cursor.execute(
-                "INSERT INTO trotinette (category,name,price,qte,image_id) VALUES (?,?,?,?,?)",
-                (categorie.lower(), modele.lower(), prix, qte, image_id))
+        try:
+            cursor.execute("INSERT INTO pictures(id_pictures, data) VALUES(?, ?)", (image_id, sqlite3.Binary(file_data)))
+            # Insert into trotinette table
+            cursor.execute("""
+                INSERT INTO trotinette(name, category, price, available, location_id, image_id, qte)
+                VALUES( ?, ?, ?, ?, ?, ?, ?)
+            """, (name, category, price, available, location_id, image_id, qte))
             connection.commit()
+        except Exception as e:
+            connection.rollback()
+            print(f"Error inserting trotinette: {e}")
+        finally:
+            connection.close()
 
     def create_picture(self, pic_id, file_data):
         connection = self.get_connection()
@@ -238,7 +254,22 @@ class Database:
         else:
             blob_data = picture[0]
             return blob_data
-
+    def create_trotinette(self,name, category, price, available, location_id, image_id, qte, file_data):
+        connection = self.get_connection()
+        cursor = connection.cursor()
+        try:
+            cursor.execute("INSERT INTO pictures(id_pictures, data) VALUES(?, ?)", (image_id, sqlite3.Binary(file_data)))
+            # Insert into trotinette table
+            cursor.execute("""
+                INSERT INTO trotinette(name, category, price, available, location_id, image_id, qte)
+                VALUES( ?, ?, ?, ?, ?, ?, ?)
+            """, (name, category, price, available, location_id, image_id, qte))
+            connection.commit()
+        except Exception as e:
+            connection.rollback()
+            print(f"Error inserting trotinette: {e}")
+        finally:
+            connection.close()
     def get_trotinette_facture(self, idTrotinette):
         cursor = self.get_connection().cursor()
         cursor.execute("SELECT * FROM trotinette where id_trotinette=?", (idTrotinette,))
@@ -270,11 +301,23 @@ class Database:
             "DELETE FROM trotinette where id_trotinette = ? ", (id_trotinette,))
         cursor.commit()
 
-    def update_trotinette(self, id_trotinette, categorie, modele, prix, qte):
-        cursor = self.get_connection()
-        cursor.execute("UPDATE trotinette set category = ?, name =?, price =?, qte=? where id_trotinette= ?",
-                       (categorie, modele, prix, qte, id_trotinette))
-        cursor.commit()
+    def update_trotinette(self, id_trotinette, categorie, modele, prix, qte, location_id, image_data, image_id,available):
+        connection = self.get_connection()
+        cursor = connection.cursor()
+        try:
+            # Update pictures table if image data is provided
+            if image_data:
+                cursor.execute("UPDATE pictures SET data = ? WHERE id_pictures = ?", (sqlite3.Binary(image_data), image_id))
+            # Update trotinette table
+            cursor.execute("""
+                UPDATE trotinette
+                SET category = ?, name = ?, price = ?, qte = ?, location_id = ?, available = ?
+                WHERE id_trotinette = ? AND image_id = ?
+            """, (categorie, modele, prix, qte, location_id, available, id_trotinette, image_id))
+            connection.commit()
+        except Exception as e:
+            connection.rollback()
+            print(f"Error updating trotinette: {e}")
 
     def update_trotinette_qte_Dec(self, id_trotinette):
         cursor = self.get_connection().cursor()
@@ -317,10 +360,9 @@ class Database:
         else:
             return None
 
-    def create_picture(self, pic_id, file_data):
+    def create_picture(self, image_id, file_data):
         connection = self.get_connection()
-        connection.execute("INSERT into pictures(id_pictures, data) values (?,?) ", [
-                           pic_id, sqlite3.Binary(file_data.read())])
+        connection.execute("INSERT INTO pictures(id_pictures, data) VALUES(?, ?)", (image_id, sqlite3.Binary(file_data)))
         connection.commit()
 
     def get_picture_data(self, picture_id):

@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <table class="table">
+        <table class="table mt-5">
             <thead>
                 <tr>
                     <th scope="col">ID</th>
@@ -8,6 +8,7 @@
                     <th scope="col">Location</th>
                     <th scope="col">Price $/h</th>
                     <th scope="col">Image</th>
+                    <th scope="col">Categorie</th>
                     <th scope="col">Quentite</th>
                     <th scope="col">Modifier</th>
                 </tr>
@@ -18,7 +19,8 @@
                     <td>{{ item.name }}</td>
                     <td>{{ item.location.name }}</td>
                     <td>{{ item.price }}</td>
-                    <td><img src="../../images/scooter1.webp" class="scooter-img" /></td>
+                    <td><img :src="getImageSrc(item.image.data)" class="scooter-img" /></td>
+                    <td>{{ item.category }}</td>
                     <td>{{ item.qte }}</td>
                     <td><button class="btn btn-info" @click="editProduct(index)"><i
                                 class="bi bi-pencil-square"></i></button></td>
@@ -27,18 +29,19 @@
 
             </tbody>
         </table>
-        <div>
+        <div class="d-flex justify-content-center align-items-center">
             <button type="button" class="btn btn-primary" @click="showModalAddProduct">Ajouter
                 produit</button>
         </div>
 
     </div>
-    <ProductsModal :isVisible="state.showProductModal" @close="closeModal" />
-    <EditProduct :isVisible="state.showEditProduct" @close="closeEditModal" :trotinette="state.productToEdit" />
+    <ProductsModal :isVisible="state.showProductModal" @close="closeModal" :locations="state.locations" />
+    <EditProduct :isVisible="state.showEditProduct" @close="closeEditModal" :trotinette="state.productToEdit"
+        :locations="state.locations" />
 </template>
 <script lang="ts">
 import { defineComponent, inject, onMounted, reactive, ref } from 'vue'
-import { GetTrotinettes, Trotinette } from './admin'
+import { GetTrotinettes, Trotinette, Location } from './admin'
 import ProductsModal from './modals/ProductsModal.vue';
 import EditProduct from './modals/EditProduct.vue';
 
@@ -53,12 +56,15 @@ export default defineComponent({
             trotinettes: [] as Array<Trotinette>,
             showProductModal: false,
             showEditProduct: false,
-            productToEdit: {} as Trotinette
+            productToEdit: {} as Trotinette,
+            locations: [] as Array<Location>
         })
 
         onMounted(async () => {
             state.trotinettes = await trotinettes.getTrotinettes();
-            console.log(state.trotinettes)
+            console.log('scooter', state.trotinettes)
+            state.locations = await trotinettes.getLocations()
+            console.log(state.locations)
         })
         const showModalAddProduct = () => {
             state.showProductModal = true
@@ -74,13 +80,17 @@ export default defineComponent({
             state.productToEdit = state.trotinettes[index]
             console.log('EDIT', state.productToEdit)
         }
+        const getImageSrc = (imageData: string) => {
+            return `data:image/webp;base64,${imageData}`;
+        };
         return {
             trotinettes,
             state,
             showModalAddProduct,
             closeModal,
             editProduct,
-            closeEditModal
+            closeEditModal,
+            getImageSrc
         }
     },
 })
