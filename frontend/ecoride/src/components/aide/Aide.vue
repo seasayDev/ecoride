@@ -71,11 +71,11 @@
   export default defineComponent({
     name: 'Aide',
     setup() {
-      const loginUser = inject('loginUser') as LoginUser;
+      
       const router = useRouter();
   
       return {
-        loginUser,
+  
         router
       };
     }
