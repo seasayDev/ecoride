@@ -469,7 +469,7 @@ class Database:
     def get_user_info(self, id_user):
         cursor = self.get_connection().cursor()
         cursor.execute(("SELECT users.first_name, users.last_name, users.email, users.date_of_birth, users.phone, " +
-                        "addresses.address, addresses.country, addresses.city, addresses.province, addresses.postal_code " +
+                        "addresses.address, addresses.country, addresses.city, addresses.province, addresses.postal_code, addresses.id_address " +
                         "FROM users " +
                         "JOIN addresses ON users.address_id = addresses.id_address " +
                         "WHERE users.id_user = ?"),
@@ -488,16 +488,19 @@ class Database:
                 'country': user[6],
                 'city': user[7],
                 'province': user[8],
-                'postalCode': user[9]
+                'postalCode': user[9],
+                'id_address': user[10]
             }
 
-
-
-    def get_user_address_id(self, email):
+    def update_user_infos(self, id_user, first_name, last_name, email, date_of_birth, phone, address, country, city, province, postal_code, id_address):
         cursor = self.get_connection().cursor()
-        cursor.execute("SELECT address_id FROM users WHERE email = ?", (email,))
-        address_id = cursor.fetchone()
-        if address_id is None:
-            return None
-        return address_id[0]
-
+        cursor.execute(
+            ('UPDATE users set first_name = ?, last_name = ?, email = ?,  date_of_birth = ?,'
+             'phone = ?  WHERE id_user = ?'),
+            (first_name, last_name, email, date_of_birth, phone, id_user))
+        cursor.connection.commit()
+        cur = self.get_connection().cursor()
+        cur.execute(
+            ('UPDATE addresses set address = ?, country = ?, city = ?, province = ?, postal_code = ? WHERE id_address = ?'),
+            (address, country, city, province, postal_code, id_address))
+        cur.connection.commit()

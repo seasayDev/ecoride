@@ -10,7 +10,7 @@ interface Session {
   fname?: string;
   id?: string;
   role?: string;
-  user_id?: string;
+  id_user?: string;
 }
 
 export const userStore = reactive({

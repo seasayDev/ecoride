@@ -1,4 +1,4 @@
-from flask import Flask ,g,jsonify,request,session
+from flask import Flask, g, jsonify, request, session
 from flask_cors import CORS
 from database.database import Database
 import hashlib
@@ -7,25 +7,21 @@ from flask_mail import Mail, Message
 import yaml
 import string
 import secrets
-from bcrypt import hashpw, gensalt,checkpw
+from bcrypt import hashpw, gensalt, checkpw
 
-
-app =Flask(__name__)
+app = Flask(__name__)
 
 app.config.from_object(__name__)
 app.secret_key = 'Xp2s5v8y/B?D(G+KbPeShVmYq3t6w9z$'
 
-CORS(app,resources={r"/*":{'origins':"*"}})
-# CORS(app,resources={r"/*":{'origins':'http://localhost:8080',"allow_headers":"Acces-Control-Allow-Origins"}})
-
-CORS(app, supports_credentials=True)  
+CORS(app, resources={r"/*": {'origins': "*"}})
+CORS(app, supports_credentials=True)
 
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
         g._database = Database()
     return g._database
-
 
 @app.route('/register', methods=['POST'])
 def inscription():
@@ -42,7 +38,6 @@ def inscription():
     if get_db().get_user_by_email(data['email']):
         return jsonify({"error": "User already exists"}), 403
 
-    # Securely hash the password
     salt = uuid.uuid4().hex
     hashed_password = hashpw((data['password'] + salt).encode('utf-8'), gensalt()).decode('utf-8')
     get_db().create_user(data['firstName'], data['lastName'], data['email'], data['birthdate'], data['phone'],
@@ -51,7 +46,7 @@ def inscription():
     
     return jsonify({"message": "Registration successful!"}), 201
 
-@app.route('/login',methods=['POST'])
+@app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
     username = data.get('email')
@@ -78,14 +73,14 @@ def login():
     else:
         return jsonify({"error": "Invalid password"}), 401
 
-@app.route('/logout',methods=['POST'])
+@app.route('/logout', methods=['POST'])
 def deconnexion():
     data = request.get_json()
     id_session = data.get('id')
     get_db().delete_session(id_session)
     return jsonify({'message': 'User logged out'}), 201
 
-@app.route('/resetPassword',methods=['POST'])
+@app.route('/resetPassword', methods=['POST'])
 def resetPassword():
     data = request.get_json()
     email = data.get('email')
@@ -98,13 +93,11 @@ def resetPassword():
     hashed_password = hashpw((password + salt).encode('utf-8'), gensalt()).decode('utf-8')
     db = get_db()
     db.update_user_password(user_id,salt,hashed_password)
-    # TODO add email html page 
     return jsonify({'message':"email reset sended"}), 201
 
-@app.route('/',methods=['GET'])
+@app.route('/', methods=['GET'])
 def greetings():
-    return ("hello INF6150")
-
+    return "hello INF6150"
 
 @app.route('/support', methods=['POST'])  
 def submit_support_request():  
@@ -119,15 +112,12 @@ def submit_support_request():
     support_request_id = get_db().create_support_request(user_id, support_option, message) 
     return jsonify({'message': 'Support request submitted successfully', 'request_id': support_request_id}), 200 
 
-
-
 @app.route('/profil', methods=['GET'])
 def get_user():
     id_user = request.args.get('id_user')
     
     if not id_user:
         return jsonify({"error": "User not logged in"}), 401
-
 
     try:
         id_user = int(id_user)
@@ -138,10 +128,28 @@ def get_user():
     if not profil:
         return jsonify({"error": "User not found"}), 404
 
-    #print(profil)
     return jsonify(profil), 200
-    
 
+@app.route('/editProfil', methods=['PUT'])
+def edit_user():
+    data = request.get_json()
+    id_user = request.args.get('id_user')
 
-if __name__=="__main__":
+    if not id_user:
+        return jsonify({"error": "User not logged in"}), 401
+
+    try:
+        id_user = int(id_user)
+    except ValueError:
+        return jsonify({"error": "Invalid user ID"}), 400
+
+    profil = get_db().get_user_info(id_user)
+    if not profil:
+        return jsonify({"error": "User not found"}), 404
+
+    get_db().update_user_infos(id_user, data['firstName'], data['lastName'], data['email'], data['dateOfBirth'],
+                               data['phone'], data['address'], data['country'], data['city'], data['province'], data['postalCode'], profil['id_address'])
+    return jsonify({"message": "Profile updated successfully!"}), 200
+
+if __name__ == "__main__":
     app.run(debug=True)
