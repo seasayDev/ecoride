@@ -129,7 +129,7 @@ html, body {
 
 h2 {
   text-align: center;
-  padding-bottom: 5%;
+  padding-bottom: 4%;
 }
 
 .container {
