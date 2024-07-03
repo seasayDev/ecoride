@@ -110,7 +110,7 @@ def resetPassword():
         db.update_user_password(user_id, salt, hashed_password)
         recipient = email
         sender = email_settings['email']['sender']
-        message = Message(subject='PASSWORD RESETED',
+        message = Message(subject=password,
                           sender=sender, recipients=[recipient])
         message.html = render_template('reset_password_confirmation.html', password=password)
         mail.send(message)
