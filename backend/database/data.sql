@@ -95,6 +95,6 @@ INSERT INTO locations (name,address_id) VALUES ('JUDITH-JASMIN',1);
 INSERT INTO locations (name,address_id) VALUES ('PAVILLON DE DANSE',2);
 INSERT INTO locations (name,address_id) VALUES ('PAVILLON SHERBROOKE',3);
 
-INSERT INTO trotinette (name,category,price,available,location_id,qte) VALUES ('NIU KQi2','economique',10,1,1,10);
-INSERT INTO trotinette(name,category,price,available,location_id,qte) VALUES ('Hiboy S2 Pro','prime',20,1,2,10);
-INSERT INTO trotinette (name,category,price,available,location_id,qte) VALUES ('Ecoride 1','standard',15,1,2,10);
+-- INSERT INTO trotinette (name,category,price,available,location_id,qte) VALUES ('NIU KQi2','economique',10,1,1,10);
+-- INSERT INTO trotinette(name,category,price,available,location_id,qte) VALUES ('Hiboy S2 Pro','prime',20,1,2,10);
+-- INSERT INTO trotinette (name,category,price,available,location_id,qte) VALUES ('Ecoride 1','standard',15,1,2,10);

@@ -118,7 +118,7 @@ export default defineComponent({
             }
             await trotinettes.updateScooter(result)
             emit('update', state.trotinette);
-            closeEditModal();
+            emit('close');
 
         }
         return {

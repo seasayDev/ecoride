@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, inject } from 'vue'
+import { defineComponent, PropType, inject,watch,reactive } from 'vue'
 import { Trotinette, Location, Newscooter, GetTrotinettes } from '../admin'
 
 export default defineComponent({
@@ -42,10 +42,24 @@ export default defineComponent({
         const closeModal = () => {
             emit('close');
         };
+        const state = reactive({
+            trotinette: { ...props.trotinette },
+           
+        })
+        watch(() => props.trotinette, (newValue) => {
+            state.trotinette = { ...newValue }
+            
 
+        }, { immediate: true })
+        
+        const deleteProduct = async ()=>{
+            await trotinettes.deleteScooter(state.trotinette.id_trotinette)
+            emit('close');
+        }
         return {
             closeModal,
-            trotinettes
+            trotinettes,
+            deleteProduct
 
         };
     },

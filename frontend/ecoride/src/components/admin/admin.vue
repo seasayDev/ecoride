@@ -82,9 +82,11 @@ export default defineComponent({
         };
         const closeModal = () => {
             state.showProductModal = false;
+            updateProductsTable()
         };
         const closeEditModal = () => {
             state.showEditProduct = false
+            updateProductsTable()
         }
         const editProduct = (index: number) => {
             state.showEditProduct = true
@@ -96,6 +98,7 @@ export default defineComponent({
         }
         const hideDeleteModal = () => {
             state.isDeleteModalVisible = false;
+            updateProductsTable()
         }
         const getImageSrc = (imageData: string) => {
             return `data:image/webp;base64,${imageData}`;

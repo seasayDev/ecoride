@@ -233,7 +233,7 @@ def create_scooter():
         location_id = data.get('location', {}).get('id_location')
         image_data = data.get('image', {}).get('data')
         qte = data.get('qte')
-        print(name,category,price,location_id,qte,image_data)
+        # print(name,category,price,location_id,qte,image_data)
         if not (name and category and price and location_id and qte is not None):
             return jsonify({'error': 'Missing required fields'}), 400
         image_id = str(uuid.uuid4().hex)
@@ -263,7 +263,7 @@ def update_scooter():
             image_id = str(uuid.uuid4().hex)
             get_db().create_picture(image_id,file_data)
         # Print for debugging
-        print(id_trotinette, name, category, price, available, location_id, image_id, qte)
+        # print(id_trotinette, name, category, price, available, location_id, image_id, qte)
 
         # Call the update function
         get_db().update_trotinette(id_trotinette, category, name, price, qte, location_id, file_data, image_id, available)
@@ -312,5 +312,12 @@ def edit_user():
                                data['phone'], data['address'], data['country'], data['city'], data['province'], data['postalCode'], profil['id_address'])
     return jsonify({"message": "Profile updated successfully!"}), 200
 
+
+@app.route('/deleteScooter',methods=['POST'])
+def delete_scooter():
+    data =request.get_json()
+    id_trotinette = data.get('id')
+    get_db().delete_trotinette(id_trotinette)
+    return jsonify({'message':'scooter is deleted '}),200
 if __name__ == "__main__":
     app.run(debug=True)

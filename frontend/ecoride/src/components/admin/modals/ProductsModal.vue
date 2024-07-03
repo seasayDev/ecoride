@@ -111,7 +111,7 @@ export default defineComponent({
                 qte: state.trotinette.qte,
             } as Newscooter
             await trotinettes.createScooter(result)
-            closeModal()
+            emit('close');
         }
 
         return {
