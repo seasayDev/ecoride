@@ -8,7 +8,7 @@ import Profil from '@/components/profil/Profil.vue'
 import EditProfil from '@/components/editProfil/EditProfil.vue'
 import admin from '@/components/admin/admin.vue'
 import Aide from '@/components/aide/Aide.vue'
-
+import Map from '@/components/map/Map.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,11 +18,11 @@ const router = createRouter({
     { path: '/resetPassword', name: 'ResetPassword', component: ResetPassword },
     { path: '/', name: 'Home', component: Home },
     { path: '/support', name: 'Support', component: Support },
-    {path:'/profil', name:'Profil', component: Profil},
-    {path:'/editProfil', name:'EditProfil', component: EditProfil},
+    { path: '/profil', name: 'Profil', component: Profil },
+    { path: '/editProfil', name: 'EditProfil', component: EditProfil },
     { path: '/admin', name: 'admin', component: admin },
-    {path:'/aide', name:'Aide', component: Aide},
-
+    { path: '/aide', name: 'Aide', component: Aide },
+    { path: '/map', name: 'Map', component: Map }
   ]
 })
 
