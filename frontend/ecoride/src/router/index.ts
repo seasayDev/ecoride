@@ -9,6 +9,7 @@ import EditProfil from '@/components/editProfil/EditProfil.vue'
 import admin from '@/components/admin/admin.vue'
 import Aide from '@/components/aide/Aide.vue'
 import Map from '@/components/map/Map.vue'
+import ReservationDetails from '@/components/reservationDetails/ReservationDetails.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -22,7 +23,8 @@ const router = createRouter({
     { path: '/editProfil', name: 'EditProfil', component: EditProfil },
     { path: '/admin', name: 'admin', component: admin },
     { path: '/aide', name: 'Aide', component: Aide },
-    { path: '/map', name: 'Map', component: Map }
+    { path: '/map', name: 'Map', component: Map },
+    { path: '/reservation-details', name: 'ReservationDetails', component: ReservationDetails }
   ]
 })
 

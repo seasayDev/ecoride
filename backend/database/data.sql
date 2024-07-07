@@ -25,12 +25,13 @@ CREATE TABLE IF NOT EXISTS reservations (
     id_reservation INTEGER PRIMARY KEY,
     start_date DATETIME,
     end_date DATETIME,
-    pick_up_address TEXT,
-    drop_off_address TEXT,
+    pick_up_location_id INTEGER,
+    drop_off_location_id INTEGER,
     total_cost INTEGER,
     trotinette_id INTEGER,
     user_id INTEGER,
     options TEXT,
+    resrvation_hours INTEGER,
     FOREIGN KEY (trotinette_id) REFERENCES trotinette (id_trotinette),
     FOREIGN KEY (user_id) REFERENCES users (id_user)
 );
