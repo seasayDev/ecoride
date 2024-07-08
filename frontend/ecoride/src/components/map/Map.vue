@@ -18,8 +18,13 @@ export default defineComponent({
   name: 'Map',
   setup() {
     const mapContainer = ref<HTMLDivElement | null>(null);
-    const pk_pavillon =[[45.50837995371091, -73.5687737935345]]
-    // Coordinates to follow
+
+    // Coordinate locations
+    const pavillonCoordinates = [45.50837995371091, -73.5687737935345];
+    const arrivalCoordinates = [45.52044569263199, -73.56796069758204];
+    const dansePvCoordinates = [45.51448129714742, -73.56079792313432];
+
+    // Path coordinates
     const pathCoordinates = [
       [45.50837995371091, -73.5687737935345],
       [45.509041520402015, -73.56825879218617],
@@ -64,7 +69,7 @@ export default defineComponent({
       [45.52044569263199, -73.56796069758204],
     ];
 
-    // Coordinates for Montreal
+    // Initial coordinates for Montreal
     const montrealCoordinates = [45.5017, -73.5673];
 
     onMounted(() => {
@@ -86,11 +91,11 @@ export default defineComponent({
         // Custom icon for the electric scooter
         const scooterIcon = L.icon({
           iconUrl: scooterImage,
-          iconSize: [38, 38], // Adjust the size as needed
-          iconAnchor: [19, 19], // Anchor the icon at the center
+          iconSize: [38, 38],
+          iconAnchor: [19, 19],
         });
 
-        const marker = L.marker(pathCoordinates[0], { icon: scooterIcon }).addTo(map)
+        const scooterMarker = L.marker(pathCoordinates[0], { icon: scooterIcon }).addTo(map)
           .bindPopup('Moving Scooter')
           .openPopup();
 
@@ -102,31 +107,34 @@ export default defineComponent({
           step += 1;
           if (step >= pathCoordinates.length) {
             clearInterval(interval);
-            marker.bindPopup('Arrived').openPopup();
+            scooterMarker.bindPopup('Arrived').openPopup();
             return;
           }
 
-          marker.setLatLng(pathCoordinates[step]);
+          scooterMarker.setLatLng(pathCoordinates[step]);
           pathLine.addLatLng(pathCoordinates[step]);
-        }, 1000); // Update every second
+        }, 1000);
 
-        const blueDotIcon = L.divIcon({
+        // Custom blue dot icon for locations
+        const createBlueDotIcon = () => L.divIcon({
           html: '<i class="bi bi-shop" style="color: blue; font-size: 24px;"></i>',
           className: 'custom-blue-dot-icon',
           iconSize: [24, 24],
-          iconAnchor: [12, 12], // Adjust as needed
+          iconAnchor: [12, 12],
         });
-        const blueDotMarker = L.marker(pk_pavillon[0], { icon: blueDotIcon }).addTo(map);
 
-        blueDotMarker.on('click', () => {
+        const pavillonMarker = L.marker(pavillonCoordinates, { icon: createBlueDotIcon() }).addTo(map);
+        const arrivalMarker = L.marker(arrivalCoordinates, { icon: createBlueDotIcon() }).addTo(map);
+        const dansePvMarker = L.marker(dansePvCoordinates, { icon: createBlueDotIcon() }).addTo(map);
+
+        pavillonMarker.on('click', () => {
           const popupContent = document.createElement('div');
           const popupApp = createApp({
             render: () => h(PopupContent)
           });
           popupApp.mount(popupContent);
-          blueDotMarker.bindPopup(popupContent).openPopup();
+          pavillonMarker.bindPopup(popupContent).openPopup();
         });
-      
       }
     });
 
