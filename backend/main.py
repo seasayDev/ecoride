@@ -319,5 +319,34 @@ def delete_scooter():
     id_trotinette = data.get('id')
     get_db().delete_trotinette(id_trotinette)
     return jsonify({'message':'scooter is deleted '}),200
+
+
+@app.route('/process-payment', methods=['POST'])
+def process_payment():
+    data = request.json
+    card_number = data.get('cardNumber').replace(' ', '')
+    expiry = data.get('expiry')
+    cvv = data.get('cvv')
+    card_name = data.get('cardName')
+    amount = data.get('amount') # Futur montant du panier
+
+    db = get_db()
+    card = db.get_credit_card(card_number)
+
+    if not card:
+        return jsonify({'error': 'Credit Card  not valid'}), 400
+
+    if card[2] != expiry or card[3] != cvv or card[4] != card_name:
+        return jsonify({'error': 'card info invalid'}), 400
+
+    
+    # Futur utilisateur session
+    user_id = 1
+
+    # Processus ajout payement
+    payment_id = db.add_payment_history(user_id, amount, card[0])
+
+    return jsonify({'message': 'Paiement réussi', 'payment_id': payment_id}), 200
+
 if __name__ == "__main__":
     app.run(debug=True)

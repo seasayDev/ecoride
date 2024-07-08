@@ -7,13 +7,13 @@ default: run
 setup:
 	@echo "Creating virtual environment..."
 	# virtualenv myenv
-	python3 -m venv myenv
+	virtualenv  myenv
 	@echo "Virtual environment created."
 
 # Target to activate the virtual environment
 env:
 	@echo "Activating virtual environment..."
-	. myenv/bin/activate
+	source  myenv/bin/activate
 
 # Target to install Python packages
 install: setup

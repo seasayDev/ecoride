@@ -98,3 +98,31 @@ INSERT INTO locations (name,address_id) VALUES ('PAVILLON SHERBROOKE',3);
 -- INSERT INTO trotinette (name,category,price,available,location_id,qte) VALUES ('NIU KQi2','economique',10,1,1,10);
 -- INSERT INTO trotinette(name,category,price,available,location_id,qte) VALUES ('Hiboy S2 Pro','prime',20,1,2,10);
 -- INSERT INTO trotinette (name,category,price,available,location_id,qte) VALUES ('Ecoride 1','standard',15,1,2,10);
+
+
+CREATE TABLE IF NOT EXISTS credit_cards (
+    id INTEGER PRIMARY KEY,
+    card_number VARCHAR(16),
+    expiry_date VARCHAR(5),
+    cvv VARCHAR(3),
+    card_holder_name VARCHAR(100),
+    user_id INTEGER,
+    FOREIGN KEY (user_id) REFERENCES users (id_user)
+);
+
+CREATE TABLE IF NOT EXISTS payment_history (
+    id INTEGER PRIMARY KEY,
+    user_id INTEGER,
+    amount INTEGER,
+    payment_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    card_id INTEGER,
+    FOREIGN KEY (user_id) REFERENCES users (id_user),
+    FOREIGN KEY (card_id) REFERENCES credit_cards (id)
+);
+
+-- Insert echantillon de valeur 
+INSERT INTO credit_cards (card_number, expiry_date, cvv, card_holder_name, user_id)
+VALUES 
+('1234567890123456', '12/25', '123', 'John Doe', 1),
+('9876543210987654', '06/24', '456', 'Jane Smith', 2),
+('1111222233334444', '09/23', '789', 'Alice Johnson', 3);

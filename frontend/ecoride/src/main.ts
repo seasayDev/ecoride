@@ -23,6 +23,8 @@ import { faUser, faEnvelope, faPhone, faMapMarkerAlt, faCalendarAlt, faGlobe, fa
 library.add(faUser, faEnvelope, faPhone, faMapMarkerAlt, faCalendarAlt, faGlobe, faCity, faMap, faMailBulk, faPen)
 import { GetTrotinettes } from './components/admin/admin'
 import { SupportService } from '@/components/support/support'
+import { PaymentService } from '@/components/payement/payement'
+
 
 const app = createApp(App)
 const backURL = 'http://127.0.0.1:5000' // back end url to send api requests
@@ -39,4 +41,5 @@ app.provide('loginUser', new LoginUser(backURL))
 app.provide('resetPassword', new ResetPassword(backURL))
 app.provide('getTrotinettes', new GetTrotinettes(backURL))
 app.provide('supportService', new SupportService(backURL + '/support'))
+app.provide('paymentService', new PaymentService(backURL + '/process-payment'))
 app.mount('#app')

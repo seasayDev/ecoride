@@ -580,3 +580,19 @@ class Database:
         cursor = self.get_connection().cursor()
         cursor.execute("SELECT * FROM users WHERE id_user=?", (user_id,))
         return cursor.fetchone()
+
+    # Credit card logic 
+    def get_credit_card(self, card_number):
+        connection = self.get_connection()
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM credit_cards WHERE card_number = ?", (card_number,))
+        return cursor.fetchone()
+
+    def add_payment_history(self, user_id, amount, card_id):
+        connection = self.get_connection()
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO payment_history (user_id, amount, card_id) VALUES (?, ?, ?)",
+                   (user_id, amount, card_id))
+        connection.commit()
+        return cursor.lastrowid
+        

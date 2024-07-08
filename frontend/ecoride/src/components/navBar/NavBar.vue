@@ -14,6 +14,11 @@
                 <router-link v-if="userStore.user" to="/profil">Profil</router-link>
             </li>
 
+
+            <li>
+                <router-link v-if="userStore.user" to="/payement">Payement</router-link>
+            </li>
+
             <li>
                 <router-link v-if="userStore.user" to="/aide">Aide</router-link>
             </li>
