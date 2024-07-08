@@ -75,6 +75,7 @@ import { Trotinette } from '../scooterCard';
 import { userStore, getUserFromStorage } from "@/components/helpers/userSession";
 import { Location, Newscooter, GetTrotinettes } from '../admin';
 
+
 export default defineComponent({
   props: {
     isVisible: {

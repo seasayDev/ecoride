@@ -88,13 +88,13 @@ CREATE TABLE IF NOT EXISTS support_requests (
     FOREIGN KEY (user_id) REFERENCES users (id_user)
 );
 
-INSERT INTO addresses (address,country,city,province,postal_code) VALUES ('1564 R. Saint-Denis','Canada','Montreal','Quebec','H2X 1K1');
-INSERT INTO addresses (address,country,city,province,postal_code) VALUES ('840 Rue Cherrier','Canada','Montreal','Quebec','H2L 1H4');
-INSERT INTO addresses (address,country,city,province,postal_code) VALUES ('200 Rue Sherbrooke O','Canada','Montreal','Quebec','H2X 1X5');
+-- INSERT INTO addresses (address,country,city,province,postal_code) VALUES ('1564 R. Saint-Denis','Canada','Montreal','Quebec','H2X 1K1');
+-- INSERT INTO addresses (address,country,city,province,postal_code) VALUES ('840 Rue Cherrier','Canada','Montreal','Quebec','H2L 1H4');
+-- INSERT INTO addresses (address,country,city,province,postal_code) VALUES ('200 Rue Sherbrooke O','Canada','Montreal','Quebec','H2X 1X5');
 
-INSERT INTO locations (name,address_id) VALUES ('JUDITH-JASMIN',1);
-INSERT INTO locations (name,address_id) VALUES ('PAVILLON DE DANSE',2);
-INSERT INTO locations (name,address_id) VALUES ('PAVILLON SHERBROOKE',3);
+-- INSERT INTO locations (name,address_id) VALUES ('JUDITH-JASMIN',1);
+-- INSERT INTO locations (name,address_id) VALUES ('PAVILLON DE DANSE',2);
+-- INSERT INTO locations (name,address_id) VALUES ('PAVILLON SHERBROOKE',3);
 
 -- INSERT INTO trotinette (name,category,price,available,location_id,qte) VALUES ('NIU KQi2','economique',10,1,1,10);
 -- INSERT INTO trotinette(name,category,price,available,location_id,qte) VALUES ('Hiboy S2 Pro','prime',20,1,2,10);
@@ -124,6 +124,8 @@ CREATE TABLE IF NOT EXISTS payment_history (
 -- Insert echantillon de valeur 
 INSERT INTO credit_cards (card_number, expiry_date, cvv, card_holder_name, user_id)
 VALUES 
-('1234567890123456', '12/25', '123', 'John Doe', 1),
-('9876543210987654', '06/24', '456', 'Jane Smith', 2),
-('1111222233334444', '09/23', '789', 'Alice Johnson', 3);
+-- ('1234567890123456', '12/25', '123', 'John Doe', 1),
+-- ('9876543210987654', '06/24', '456', 'Jane Smith', 2),
+-- ('1111222233334444', '09/23', '789', 'Alice Johnson', 3),
+('4444444444444444', '01/24', '789', 'Alice test1', 4),
+('5555555555555555', '01/25', '789', 'Alice test2', 5);

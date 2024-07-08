@@ -24,6 +24,11 @@
             <!-- Payment Form Section -->
             <div class="col-md-4 payment-form d-flex align-items-center">
                 <div class="w-100">
+                    <!-- Error Alert -->
+                    <div v-if="errorMessage" class="alert alert-danger" role="alert">
+                        {{ errorMessage }}
+                    </div>
+
                     <p class="text-muted">
                         <i class="bi bi-info-circle-fill"></i> Un dépôt de 200 $ sera prélevé sur votre carte de crédit et
                         vous sera restitué une fois la trottinette retournée au lieu de retour.
@@ -40,7 +45,7 @@
                         </div>
                     </div>
                     <div v-if="selectedCard" class="payment-details">
-                        <form>
+                        <form @submit.prevent="handleSubmit">
                             <div class="form-group">
                                 <label for="cardNumber">Numéro de carte</label>
                                 <input type="text" class="form-control" id="cardNumber" v-model="formattedCardNumber"
@@ -48,7 +53,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="cardName">Nom du titulaire</label>
-                                <input type="text" class="form-control" id="cardName"
+                                <input type="text" class="form-control" id="cardName" v-model="cardName"
                                     placeholder="Entrez le nom du titulaire" required>
                             </div>
                             <div class="form-group">
@@ -69,23 +74,29 @@
         </div>
     </div>
 </template>
-  
+
 <script lang="ts">
-import { defineComponent, onMounted, ref, computed } from 'vue';
+import { defineComponent, onMounted, ref, computed, inject } from 'vue';
+import { PaymentService, PaymentForm } from '@/components/payement/payement';
+import { useRouter } from "vue-router";
 
 export default defineComponent({
     setup() {
+        const paymentService = inject('paymentService') as PaymentService;
         const trotinette = ref(null);
         const reservationDate = ref('');
         const reservationTime = ref('');
         const reservationDuration = ref(0);
         const dropOutLocation = ref('');
         const totalCost = ref(0);
-        const userId = ref(0);
+        const userId = ref('');
         const selectedCard = ref('');
         const cardNumber = ref('');
+        const cardName = ref('');
         const expiryDate = ref('');
         const cvv = ref('');
+        const errorMessage = ref('');
+        const router = useRouter();
 
         onMounted(() => {
             const reservationDetails = JSON.parse(localStorage.getItem('reservationDetails') as string);
@@ -149,6 +160,36 @@ export default defineComponent({
             }
         });
 
+        const handleSubmit = async () => {
+            const form: PaymentForm = {
+                amount: totalCost.value.toString(),
+                cardNumber: cardNumber.value.replace(/\s/g, ''),
+                cardName: cardName.value,
+                expiry: expiryDate.value,
+                cvv: cvv.value,
+                user_id: userId.value,
+                trotinette: trotinette.value,
+                reservationDate: reservationDate.value,
+                reservationTime: reservationTime.value,
+                reservationDuration: reservationDuration.value,
+                dropOutLocation: dropOutLocation.value,
+                totalCost: totalCost.value,
+            };
+
+            try {
+                const response = await paymentService.processPayment(form);
+                console.log('Payment successful:', response);
+                router.push({ name: 'Map' });
+            } catch (error) {
+                console.error('Payment failed:', error);
+                if (error.response && error.response.data && error.response.data.error) {
+                    errorMessage.value = error.response.data.error;
+                } else {
+                    errorMessage.value = 'An unexpected error occurred. Please try again.';
+                }
+            }
+        };
+
         return {
             trotinette,
             reservationDate,
@@ -159,15 +200,20 @@ export default defineComponent({
             userId,
             selectedCard,
             cardNumber,
+            cardName,
             expiryDate,
             cvv,
             selectCardType,
             formattedCardNumber,
             formattedExpiryDate,
+            handleSubmit,
+            errorMessage,
+            paymentService,
         };
     },
 });
 </script>
+
   
 <style scoped>
 .trotinette-image {
