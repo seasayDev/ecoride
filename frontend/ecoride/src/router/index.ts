@@ -10,6 +10,8 @@ import admin from '@/components/admin/admin.vue'
 import Aide from '@/components/aide/Aide.vue'
 import Map from '@/components/map/Map.vue'
 
+
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
