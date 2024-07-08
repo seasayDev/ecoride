@@ -8,8 +8,7 @@ import yaml
 import string
 import secrets
 from bcrypt import hashpw, gensalt, checkpw
-from datetime import datetime
-from bcrypt import hashpw, gensalt,checkpw
+from datetime import datetime, timedelta
 import base64
 
 app = Flask(__name__)
@@ -28,8 +27,6 @@ app.config['MAIL_USERNAME'] = email_settings['email']['username']
 app.config['MAIL_PASSWORD'] = email_settings['email']['password']
 app.config['MAIL_USE_TLS'] = True
 mail = Mail(app)
-
-
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -110,7 +107,7 @@ def resetPassword():
         db.update_user_password(user_id, salt, hashed_password)
         recipient = email
         sender = email_settings['email']['sender']
-        message = Message(subject=password,
+        message = Message(subject='PASSWORD RESETED',
                           sender=sender, recipients=[recipient])
         message.html = render_template('reset_password_confirmation.html', password=password)
         mail.send(message)
@@ -120,7 +117,7 @@ def resetPassword():
 
 @app.route('/', methods=['GET'])
 def greetings():
-    return ("hello INF6150")
+    return "hello INF6150"
 
 @app.route('/support', methods=['GET'])
 def support_page():
@@ -188,39 +185,45 @@ def get_locations():
 
 @app.route('/reserveTrotinette', methods=['POST'])
 def reserve_trotinette():
-    data = request.get_json()
-    trotinette_id = data.get('trotinette_id')
-    user_id = data.get('user_id')
-    start_date = datetime.strptime(data.get('start_date'), '%Y-%m-%d %H:%M')
-    end_date = datetime.strptime(data.get('end_date'), '%Y-%m-%d %H:%M')
-    pick_up_address = data.get('pick_up_address')
-    drop_off_address = data.get('drop_off_address')
-    options = data.get('options', '')
+    try:
+        data = request.get_json()
+        trotinette_id = data.get('trotinette_id')
+        user_id = data.get('user_id')
+        start_date = datetime.strptime(data.get('start_date'), '%Y-%m-%d')
+        duration = int(data.get('duration'))
+        end_date = start_date + timedelta(minutes=duration)
+        reservation_number = data.get('reservation_number')
 
-    db = get_db()
-    trotinette = db.get_trotinette_by_id(trotinette_id)
+        db = get_db()
+        trotinette = db.get_trotinette_by_id(trotinette_id)
 
-    if not trotinette or trotinette['qte'] <= 0:
-        return jsonify({'error': 'Trotinette not available'}), 400
+        if not trotinette or trotinette['qte'] <= 0:
+            return jsonify({'error': 'Trotinette not available'}), 400
 
-    total_cost = (end_date - start_date).seconds / 3600 * trotinette['price']
-    db.create_reservation(start_date, end_date, pick_up_address, drop_off_address, total_cost, trotinette_id, user_id, options)
-    db.update_trotinette_quantity(trotinette_id, trotinette['qte'] - 1)
+        total_cost = (end_date - start_date).total_seconds() / 3600 * trotinette['price']
+        db.create_reservation(start_date, end_date, total_cost, trotinette_id, user_id, reservation_number)
+        db.update_trotinette_quantity(trotinette_id, trotinette['qte'] - 1)
 
-    user = db.get_user_by_id(user_id)
-    recipient = user['email']
-    sender = email_settings['email']['sender']
-    message = Message(subject='Reservation Confirmation',
-                      sender=sender, recipients=[recipient])
-    message.html = render_template('reservation_confirmation.html', 
-                                   start_date=start_date, 
-                                   end_date=end_date, 
-                                   total_cost=total_cost,
-                                   pick_up_address=pick_up_address,
-                                   drop_off_address=drop_off_address)
-    mail.send(message)
+        user = db.get_user_by_id(user_id)
+        recipient = user['email']
+        sender = email_settings['email']['sender']
+        message = Message(subject='Reservation Confirmation',
+                          sender=sender, recipients=[recipient])
+        message.html = render_template('reservation_confirmation.html',
+                                       start_date=start_date,
+                                       end_date=end_date,
+                                       total_cost=total_cost,
+                                       reservation_number=reservation_number)
+        mail.send(message)
 
-    return jsonify({'message': 'Reservation successful'}), 201
+        return jsonify({'message': 'Reservation successful', 'reservation_number': reservation_number}), 201
+    except Exception as e:
+        print(f"Error during reservation: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/confirmReservation/<reservation_number>', methods=['GET'])
+def confirm_reservation(reservation_number):
+    return jsonify({'message': 'Reservation confirmed', 'reservation_number': reservation_number})
 
 @app.route('/createScooter',methods=['POST'])
 def create_scooter():
@@ -233,13 +236,12 @@ def create_scooter():
         location_id = data.get('location', {}).get('id_location')
         image_data = data.get('image', {}).get('data')
         qte = data.get('qte')
-        # print(name,category,price,location_id,qte,image_data)
         if not (name and category and price and location_id and qte is not None):
             return jsonify({'error': 'Missing required fields'}), 400
         image_id = str(uuid.uuid4().hex)
         file_data = base64.b64decode(image_data) if image_data else None
         get_db().create_trotinette(name, category, price, available, location_id, image_id, qte, file_data)
-        return jsonify({'message':"sccoter added"}), 201
+        return jsonify({'message':"scooter added"}), 201
     except Exception as e:
         return jsonify({'error': 'An error occurred while processing your request'}), 500
 
@@ -257,21 +259,16 @@ def update_scooter():
         image_id = data.get('image', {}).get('id')
         qte = data.get('qte')
 
-        # Decode the base64 image data if it exists
         file_data = base64.b64decode(image_data) if image_data else None
         if not image_id:
             image_id = str(uuid.uuid4().hex)
             get_db().create_picture(image_id,file_data)
-        # Print for debugging
-        # print(id_trotinette, name, category, price, available, location_id, image_id, qte)
-
-        # Call the update function
+        
         get_db().update_trotinette(id_trotinette, category, name, price, qte, location_id, file_data, image_id, available)
         return jsonify({'message': 'Scooter updated'}), 200
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({'error': 'An error occurred while processing your request'}), 500
-
 
 @app.route('/profil', methods=['GET'])
 def get_user():
@@ -312,12 +309,46 @@ def edit_user():
                                data['phone'], data['address'], data['country'], data['city'], data['province'], data['postalCode'], profil['id_address'])
     return jsonify({"message": "Profile updated successfully!"}), 200
 
-
 @app.route('/deleteScooter',methods=['POST'])
 def delete_scooter():
     data =request.get_json()
     id_trotinette = data.get('id')
     get_db().delete_trotinette(id_trotinette)
     return jsonify({'message':'scooter is deleted '}),200
+
+
+    @app.route('/reserveTrotinette', methods=['POST'])
+def reserve_trotinette():
+    data = request.get_json()
+    trotinette_id = data.get('trotinette_id')
+    user_id = data.get('user_id')
+    start_date = datetime.strptime(data.get('start_date'), '%Y-%m-%d')
+    duration = int(data.get('duration'))
+    end_date = start_date + timedelta(hours=duration)
+
+    db = get_db()
+    trotinette = db.get_trotinette_by_id(trotinette_id)
+
+    if not trotinette or trotinette['qte'] <= 0:
+        return jsonify({'error': 'Trotinette not available'}), 400
+
+    total_cost = duration * trotinette['price']
+    db.create_reservation(start_date, end_date, total_cost, trotinette_id, user_id)
+    db.update_trotinette_quantity(trotinette_id, trotinette['qte'] - 1)
+
+    user = db.get_user_by_id(user_id)
+    recipient = user['email']
+    sender = email_settings['email']['sender']
+    message = Message(subject='Reservation Confirmation',
+                      sender=sender, recipients=[recipient])
+    message.html = render_template('reservation_confirmation.html',
+                                   start_date=start_date,
+                                   end_date=end_date,
+                                   total_cost=total_cost)
+    mail.send(message)
+
+    return jsonify({'message': 'Reservation successful'}), 201
+
+
 if __name__ == "__main__":
     app.run(debug=True)
