@@ -329,7 +329,7 @@ def process_payment():
     cvv = data.get('cvv')
     card_name = data.get('cardName')
     amount = data.get('amount') # Futur montant du panier
-
+    user_id = data.get('user_id')
     db = get_db()
     card = db.get_credit_card(card_number)
 
@@ -341,7 +341,7 @@ def process_payment():
 
     
     # Futur utilisateur session
-    user_id = 1
+    
 
     # Processus ajout payement
     payment_id = db.add_payment_history(user_id, amount, card[0])
