@@ -11,6 +11,8 @@ import Aide from '@/components/aide/Aide.vue'
 import Map from '@/components/map/Map.vue'
 import Payement from '@/components/payement/Payement.vue'
 import ReservationDetails from '@/components/reservationDetails/ReservationDetails.vue'
+import Promotions from '@/components/promotions/promotion.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +28,7 @@ const router = createRouter({
     { path: '/aide', name: 'Aide', component: Aide },
     { path: '/map', name: 'Map', component: Map },
     { path: '/payement', name: 'Payement', component: Payement },
+    { path: '/promotions', name: 'Promotions', component: Promotions, meta: { requiresAuth: true } },
     { path: '/reservation-details', name: 'ReservationDetails', component: ReservationDetails }
   ]
 })
