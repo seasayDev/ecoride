@@ -11,7 +11,7 @@ import Aide from '@/components/aide/Aide.vue'
 import Map from '@/components/map/Map.vue'
 import Payement from '@/components/payement/Payement.vue'
 import ReservationDetails from '@/components/reservationDetails/ReservationDetails.vue'
-
+import AddReview from '@/components/review/review.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -26,7 +26,8 @@ const router = createRouter({
     { path: '/aide', name: 'Aide', component: Aide },
     { path: '/map', name: 'Map', component: Map },
     { path: '/payement', name: 'Payement', component: Payement },
-    { path: '/reservation-details', name: 'ReservationDetails', component: ReservationDetails }
+    { path: '/reservation-details', name: 'ReservationDetails', component: ReservationDetails },
+    { path: '/review', name: 'AddReview', component: AddReview }
   ]
 })
 
