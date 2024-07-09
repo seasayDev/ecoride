@@ -19,6 +19,8 @@ app.secret_key = 'Xp2s5v8y/B?D(G+KbPeShVmYq3t6w9z$'
 
 CORS(app, resources={r"/*": {'origins': "*"}})
 CORS(app, supports_credentials=True)
+
+
 with open('email.yaml') as f:
     email_settings = yaml.safe_load(f)
 
@@ -347,6 +349,54 @@ def process_payment():
     payment_id = db.add_payment_history(user_id, amount, card[0])
 
     return jsonify({'message': 'Paiement réussi', 'payment_id': payment_id}), 200
+
+
+@app.route('/facturation', methods=['POST'])
+def add_facturation():
+    data = request.get_json()
+    id_user = data.get('id_user')
+    if not id_user:
+        return jsonify({"error": "User ID is required"}), 400
+    
+    required_fields = ["nom", "prenom", "adresse", "ville", "province", "codePostal", "telephone", "montant"]
+    if not all(data.get(field) for field in required_fields):
+        return jsonify({"error": "All fields are required."}), 400
+    
+    try:
+        get_db().add_facturation(id_user, data['nom'], data['prenom'], data['adresse'], 
+                                 data['ville'], data['province'], data['codePostal'], 
+                                 data['telephone'], data['montant'])
+        return jsonify({"message": "Facturation ajoutée avec succès"}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/facturation/<id_user>', methods=['GET'])
+def get_facturation(id_user):
+    try:
+        facturation = get_db().get_facturation(id_user)
+        if facturation:
+            return jsonify(facturation), 200
+        else:
+            return jsonify({"message": "Aucune facturation trouvée"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/facturation/<id_user>', methods=['PUT'])
+def update_facturation(id_user):
+    data = request.get_json()
+    required_fields = ["nom", "prenom", "adresse", "ville", "province", "codePostal", "telephone", "montant"]
+    if not all(data.get(field) for field in required_fields):
+        return jsonify({"error": "All fields are required."}), 400
+    
+    try:
+        get_db().update_facturation(id_user, data['nom'], data['prenom'], data['adresse'], 
+                                    data['ville'], data['province'], data['codePostal'], 
+                                    data['telephone'], data['montant'])
+        return jsonify({"message": "Facturation mise à jour avec succès"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

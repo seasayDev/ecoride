@@ -24,6 +24,7 @@ library.add(faUser, faEnvelope, faPhone, faMapMarkerAlt, faCalendarAlt, faGlobe,
 import { GetTrotinettes } from './components/admin/admin'
 import { SupportService } from '@/components/support/support'
 import { PaymentService } from '@/components/payement/payement'
+import { FacturationService } from '@/components/facturation/facturation'
 
 
 const app = createApp(App)
@@ -42,4 +43,5 @@ app.provide('resetPassword', new ResetPassword(backURL))
 app.provide('getTrotinettes', new GetTrotinettes(backURL))
 app.provide('supportService', new SupportService(backURL + '/support'))
 app.provide('paymentService', new PaymentService(backURL + '/process-payment'))
+app.provide('facturationService', new FacturationService(backURL))
 app.mount('#app')
