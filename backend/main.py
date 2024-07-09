@@ -319,5 +319,49 @@ def delete_scooter():
     id_trotinette = data.get('id')
     get_db().delete_trotinette(id_trotinette)
     return jsonify({'message':'scooter is deleted '}),200
+
+
+@app.route('/sendUnlockCode', methods=['POST'])
+def send_unlock_code():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    trotinette_id = data.get('trotinette_id')
+
+    user = get_db().get_user_by_id(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    # Generate a random unlock code
+    unlock_code = ''.join(secrets.choice(string.digits) for i in range(6))
+    # Save the code in the session for validation
+    session['unlock_code'] = unlock_code
+
+    # Send email
+    recipient = user['email']
+    sender = email_settings['email']['sender']
+    message = Message(subject='Code de déverrouillage',
+                      sender=sender, recipients=[recipient])
+    message.body = f"Votre code de déverrouillage est {unlock_code}"
+    mail.send(message)
+
+    return jsonify({'message': 'Code de déverrouillage envoyé'}), 200
+
+
+
+@app.route('/validateUnlockCode', methods=['POST'])
+def validate_unlock_code():
+    data = request.get_json()
+    code = data.get('code')
+    trotinette_id = data.get('trotinette_id')
+
+    if 'unlock_code' not in session or session['unlock_code'] != code:
+        return jsonify({'success': False}), 400
+
+    # Unlock successful, update quantity
+    get_db().update_trotinette_qte_Dec(trotinette_id)
+    return jsonify({'success': True}), 200
+
+
+
 if __name__ == "__main__":
     app.run(debug=True)

@@ -13,11 +13,9 @@
             <li>
                 <router-link v-if="userStore.user" to="/profil">Profil</router-link>
             </li>
-
             <li>
                 <router-link v-if="userStore.user" to="/aide">Aide</router-link>
             </li>
-
             <li>
                 <router-link v-if="userStore.user" to="/" @click.prevent="deconnexion">Deconnexion</router-link>
             </li>
@@ -25,20 +23,22 @@
                 <router-link v-if="userStore.user" to="/admin">Admin</router-link>
             </li>
             <li>
-                <router-link v-if="userStore.user" to="/map">deplacement</router-link>
+                <router-link v-if="userStore.user" to="/map">Déplacement</router-link>
+            </li>
+            <li>
+                <router-link v-if="userStore.user" to="/deverrouiller">Déverrouiller</router-link>
             </li>
         </ul>
-
         <span v-if="userStore.user" class="username">{{ getUserName }}</span>
-
     </nav>
 </template>
   
 <script lang="ts">
 import { useRouter } from "vue-router";
-import { defineComponent, onMounted, reactive, watch, inject, computed } from 'vue';
+import { defineComponent, reactive, computed, inject } from 'vue';
 import { userStore, setUser, getUserFromStorage } from "@/components/helpers/userSession";
 import { LoginUser } from '../login';
+
 export default defineComponent({
     name: 'NavBar',
     setup() {
@@ -60,7 +60,6 @@ export default defineComponent({
             router.push("/")
         }
 
-
         return {
             state,
             deconnexion,
@@ -68,7 +67,6 @@ export default defineComponent({
             userStore,
             loginUser,
             getUserName,
-
         }
     }
 });
@@ -106,4 +104,3 @@ a:hover {
     top: 16px;
 }
 </style>
-  
