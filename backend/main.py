@@ -4,6 +4,7 @@ from database.database import Database
 import hashlib
 import uuid
 from flask_mail import Mail, Message
+import logging
 import yaml
 import string
 import secrets
@@ -11,6 +12,8 @@ from bcrypt import hashpw, gensalt, checkpw
 from datetime import datetime
 from bcrypt import hashpw, gensalt,checkpw
 import base64
+
+
 
 app = Flask(__name__)
 
@@ -29,7 +32,7 @@ app.config['MAIL_PASSWORD'] = email_settings['email']['password']
 app.config['MAIL_USE_TLS'] = True
 mail = Mail(app)
 
-
+logging.basicConfig(level=logging.DEBUG)
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -331,12 +334,10 @@ def send_unlock_code():
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
-    # Generate a random unlock code
     unlock_code = ''.join(secrets.choice(string.digits) for i in range(6))
-    # Save the code in the session for validation
     session['unlock_code'] = unlock_code
+    session['trotinette_id'] = trotinette_id
 
-    # Send email
     recipient = email
     sender = email_settings['email']['username']
     message = Message(subject='Code de déverrouillage',
@@ -346,20 +347,39 @@ def send_unlock_code():
 
     return jsonify({'success': True, 'message': 'Code de déverrouillage envoyé'}), 200
 
+
 @app.route('/validateUnlockCode', methods=['POST'])
 def validate_unlock_code():
     data = request.get_json()
     code = data.get('code')
     trotinette_id = data.get('trotinette_id')
 
-    if code != session.get('unlock_code'):
+    logging.debug(f"Received code: {code} for trotinette_id: {trotinette_id}")
+    logging.debug(f"Session data - unlock_code: {session.get('unlock_code')}, trotinette_id: {session.get('trotinette_id')}")
+
+    if not code or not trotinette_id:
+        logging.error("Missing code or trotinette_id in the request")
+        return jsonify({'success': False, 'error': 'Code or trotinette_id missing'}), 400
+
+    if 'unlock_code' not in session or 'trotinette_id' not in session:
+        logging.error("Session expired or code not sent")
+        return jsonify({'success': False, 'error': 'Session expirée ou code non envoyé'}), 400
+
+    if code != session['unlock_code'] or trotinette_id != session['trotinette_id']:
+        logging.error("Invalid code or trotinette_id mismatch")
         return jsonify({'success': False, 'error': 'Code invalide'}), 400
 
-    # Unlock the scooter (update its status in the database)
     db = get_db()
     db.update_trotinette_qte_Dec(trotinette_id)
 
+    session.pop('unlock_code', None)
+    session.pop('trotinette_id', None)
+
+    logging.info("Trottinette déverrouillée avec succès")
     return jsonify({'success': True, 'message': 'Trottinette déverrouillée avec succès'}), 200
+
+
+
 
 
 

@@ -54,6 +54,7 @@ export default defineComponent({
 
         const sendUnlockCode = async () => {
             try {
+                console.log(`Sending unlock code to email: ${state.email} for trotinette_id: ${props.trotinette.id_trotinette}`)
                 const response = await axios.post('http://127.0.0.1:5000/sendUnlockCode', {
                     email: state.email,
                     trotinette_id: props.trotinette.id_trotinette
@@ -64,23 +65,27 @@ export default defineComponent({
                     alert('Erreur lors de l\'envoi du code. Veuillez réessayer.')
                 }
             } catch (error) {
+                console.error('Erreur lors de l\'envoi du code:', error)
                 alert('Erreur lors de l\'envoi du code.')
             }
         }
 
         const validerCode = async () => {
             try {
+                console.log(`Validating code: ${state.code} for trotinette_id: ${props.trotinette.id_trotinette}`)
                 const response = await axios.post('http://127.0.0.1:5000/validateUnlockCode', {
                     code: state.code,
                     trotinette_id: props.trotinette.id_trotinette
                 })
                 if (response.data.success) {
+                    alert('Trottinette déverrouillée avec succès!')
                     emit('codeSent')
                     closeModal()
                 } else {
                     alert('Code invalide. Veuillez réessayer.')
                 }
             } catch (error) {
+                console.error('Erreur lors de la validation du code:', error.response ? error.response.data : error)
                 alert('Erreur lors de la validation du code.')
             }
         }
