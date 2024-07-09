@@ -1,7 +1,7 @@
 <template>
   <div class="container mt-5">
-    <form @submit.prevent="submitForm" class="review-form">
-      <h2>Laisser un Avis</h2>
+      <form @submit.prevent="submitForm" class="review-form">
+      <h2>Laisser un commentaire </h2>
       <span>Donnez votre avis sur la trottinette que vous avez louée</span>
       <div class="form-group">
         <label for="rating">Note</label>
