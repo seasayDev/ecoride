@@ -28,8 +28,8 @@
                 </tr>
             </tbody>
         </table>
+        <DeverrouillerModal :isVisible="state.showModal" @close="closeModal" :trotinette="state.selectedTrotinette" @codeSent="handleCodeSent" />
     </div>
-    <DeverrouillerModal :isVisible="state.showModal" @close="closeModal" :trotinette="state.selectedTrotinette" @codeSent="handleCodeSent" />
 </template>
 
 <script lang="ts">
@@ -63,6 +63,7 @@ export default defineComponent({
         }
 
         const handleCodeSent = async () => {
+            alert('Trottinette déverrouillée avec succès!')
             state.trotinettes = await trotinettes.getTrotinettes()
         }
 

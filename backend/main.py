@@ -324,10 +324,10 @@ def delete_scooter():
 @app.route('/sendUnlockCode', methods=['POST'])
 def send_unlock_code():
     data = request.get_json()
-    user_id = data.get('user_id')
+    email = data.get('email')
     trotinette_id = data.get('trotinette_id')
 
-    user = get_db().get_user_by_id(user_id)
+    user = get_db().get_user_by_email(email)
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
@@ -337,16 +337,14 @@ def send_unlock_code():
     session['unlock_code'] = unlock_code
 
     # Send email
-    recipient = user['email']
-    sender = email_settings['email']['sender']
+    recipient = email
+    sender = email_settings['email']['username']
     message = Message(subject='Code de déverrouillage',
                       sender=sender, recipients=[recipient])
     message.body = f"Votre code de déverrouillage est {unlock_code}"
     mail.send(message)
 
-    return jsonify({'message': 'Code de déverrouillage envoyé'}), 200
-
-
+    return jsonify({'success': True, 'message': 'Code de déverrouillage envoyé'}), 200
 
 @app.route('/validateUnlockCode', methods=['POST'])
 def validate_unlock_code():
@@ -354,12 +352,15 @@ def validate_unlock_code():
     code = data.get('code')
     trotinette_id = data.get('trotinette_id')
 
-    if 'unlock_code' not in session or session['unlock_code'] != code:
-        return jsonify({'success': False}), 400
+    if code != session.get('unlock_code'):
+        return jsonify({'success': False, 'error': 'Code invalide'}), 400
 
-    # Unlock successful, update quantity
-    get_db().update_trotinette_qte_Dec(trotinette_id)
-    return jsonify({'success': True}), 200
+    # Unlock the scooter (update its status in the database)
+    db = get_db()
+    db.update_trotinette_qte_Dec(trotinette_id)
+
+    return jsonify({'success': True, 'message': 'Trottinette déverrouillée avec succès'}), 200
+
 
 
 
