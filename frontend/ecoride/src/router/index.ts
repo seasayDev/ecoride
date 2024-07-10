@@ -13,6 +13,7 @@ import Payement from '@/components/payement/Payement.vue'
 import ReservationDetails from '@/components/reservationDetails/ReservationDetails.vue'
 import ReservationConfirmed from '@/components/reservationDetails/ReservationConfirmed.vue'
 import Promotions from '@/components/promotions/promotion.vue'
+import ReservationHistory from '@/components/reservationHistory/ReservationHistory.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,7 +35,13 @@ const router = createRouter({
       name: 'ReservationConfirmed',
       component: ReservationConfirmed
     },
-    { path: '/promotions', name: 'Promotions', component: Promotions, meta: { requiresAuth: true } }
+    {
+      path: '/promotions',
+      name: 'Promotions',
+      component: Promotions,
+      meta: { requiresAuth: true }
+    },
+    { path: '/reservations', name: 'Reservations', component: ReservationHistory }
   ]
 })
 
