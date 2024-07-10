@@ -33,7 +33,7 @@
               <div class="col-md-6 form-group">
                 <label for="location" class="form-label">Lieu de retour :</label>
                 <select class="form-control" id="location" v-model="state.dropOutLocation" required>
-                  <option v-for="location in state.locations" :key="location.id" :value="location.name">
+                  <option v-for="location in state.locations" :key="location.id" :value="location">
                     {{ location.name }}
                   </option>
                 </select>
@@ -55,7 +55,7 @@
             <p><strong>Heure de début :</strong> <span>{{ state.reservationTime }}</span></p>
             <p><strong>Durée de réservation (heures) :</strong> <span>{{ reservationDuration }}</span></p>
             <p><strong>Lieu de départ :</strong> <span>{{ trotinette.location.name }}</span></p>
-            <p><strong>Lieu de retour :</strong> <span>{{ state.dropOutLocation }}</span></p>
+            <p><strong>Lieu de retour :</strong> <span>{{ state.dropOutLocation.name }}</span></p>
             <p><strong>Coût total :</strong> <span>{{ costToshow }}</span></p>
             <div class="d-flex justify-content-between mt-3">
               <button class="btn btn-secondary w-50 me-2" @click="editReservation">Éditer</button>
@@ -135,7 +135,8 @@ export default defineComponent({
         reservationDate: reservationDate.value,
         reservationTime: state.reservationTime,
         reservationDuration: reservationDuration.value,
-        dropOutLocation: state.dropOutLocation,
+        dropOutLocation: state.dropOutLocation.id_location,
+        dropOutName: state.dropOutLocation.name,
         totalCost: costToshow.value,
       };
 

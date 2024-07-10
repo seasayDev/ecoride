@@ -12,7 +12,7 @@
                 <p><strong>Heure de début:</strong> {{ reservationTime }}</p>
                 <p><strong>Durée de réservation (heures):</strong> {{ reservationDuration }}</p>
                 <p><strong>Lieu de départ:</strong> {{ trotinette.location.name }}</p>
-                <p><strong>Lieu de retour:</strong> {{ dropOutLocation }}</p>
+                <p><strong>Lieu de retour:</strong> {{ dropOutName }}</p>
                 <p><strong>Coût total:</strong> {{ totalCost }}</p>
             </div>
 
@@ -97,6 +97,7 @@ export default defineComponent({
         const cvv = ref('');
         const errorMessage = ref('');
         const router = useRouter();
+        const dropOutName = ref('')
 
         onMounted(() => {
             const reservationDetails = JSON.parse(localStorage.getItem('reservationDetails') as string);
@@ -108,6 +109,7 @@ export default defineComponent({
                 dropOutLocation.value = reservationDetails.dropOutLocation;
                 totalCost.value = reservationDetails.totalCost;
                 userId.value = reservationDetails.user_id;
+                dropOutName.value = reservationDetails.dropOutName;
             }
         });
 
@@ -179,7 +181,18 @@ export default defineComponent({
             try {
                 const response = await paymentService.processPayment(form);
                 console.log('Payment successful:', response);
-                router.push({ name: 'Map' });
+                router.push({
+                    name: 'ReservationConfirmed',
+                    query: {
+                        trotinette: JSON.stringify(trotinette.value),
+                        reservationDate: reservationDate.value,
+                        reservationTime: reservationTime.value,
+                        reservationDuration: reservationDuration.value,
+                        dropOutLocation: dropOutLocation.value,
+                        totalCost: totalCost.value,
+                        dropOutName: dropOutName.value
+                    }
+                });
             } catch (error) {
                 console.error('Payment failed:', error);
                 if (error.response && error.response.data && error.response.data.error) {
@@ -209,6 +222,7 @@ export default defineComponent({
             handleSubmit,
             errorMessage,
             paymentService,
+            dropOutName
         };
     },
 });

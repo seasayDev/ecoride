@@ -328,25 +328,52 @@ def process_payment():
     expiry = data.get('expiry')
     cvv = data.get('cvv')
     card_name = data.get('cardName')
-    amount = data.get('amount') # Futur montant du panier
+    amount = data.get('amount')  # Future amount of the cart
     user_id = data.get('user_id')
+    
+    reservation_date = data.get('reservationDate')
+    reservation_duration = data.get('reservationDuration')
+    reservation_time = data.get('reservationTime')
+    total_cost = data.get('totalCost')
+    
+    trotinette = data.get('trotinette')
+    trotinette_id = trotinette.get('id_trotinette')
+    location = trotinette.get('location')
+    pick_up_location_id = location.get('id')
+    dropOutLocation = data.get('dropOutLocation')
+  
+
     db = get_db()
     card = db.get_credit_card(card_number)
 
     if not card:
-        return jsonify({'error': 'Credit Card  not valid'}), 400
+        return jsonify({'error': 'Credit Card not valid'}), 400
 
     if card[2] != expiry or card[3] != cvv or card[4] != card_name:
-        return jsonify({'error': 'card info invalid'}), 400
+        return jsonify({'error': 'Card info invalid'}), 400
 
-    
-    # Futur utilisateur session
-    
-
-    # Processus ajout payement
+    # Process payment
     payment_id = db.add_payment_history(user_id, amount, card[0])
 
-    return jsonify({'message': 'Paiement réussi', 'payment_id': payment_id}), 200
+    # Create reservation
+    end_date = reservation_date  # Start date and end date are the same for the reservation
+    reservation_hours = reservation_duration  # Reservation duration
+
+    db.create_reservation(
+        start_date=reservation_date,
+        end_date=end_date,
+        pick_up_location_id=pick_up_location_id,
+        drop_off_location_id=dropOutLocation, 
+        total_cost=total_cost,
+        trotinette_id=trotinette_id,
+        user_id=user_id,
+        options=None,  # Assuming no additional options
+        reservation_hours=reservation_hours
+    )
+
+    return jsonify({'message': 'Payment successful', 'payment_id': payment_id}), 200
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
