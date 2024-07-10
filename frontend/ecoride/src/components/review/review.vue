@@ -1,59 +1,72 @@
 <template>
   <div class="container mt-5">
-      <form @submit.prevent="submitForm" class="review-form">
-      <h2>Laisser un commentaire </h2>
-      <span>Donnez votre avis sur la trottinette que vous avez louée</span>
+    <h2>Commentaires pour la trottinette {{ scooterId }}</h2>
+    <ul v-if="commentaires.length">
+      <li v-for="commentaire in commentaires" :key="commentaire.id">
+        <p><strong>{{ commentaire.user }}</strong>: {{ commentaire.comment }}</p>
+        <p>Note: {{ commentaire.rating }}</p>
+      </li>
+    </ul>
+    <p v-else>Aucun commentaire pour le moment.</p>
+    <form @submit.prevent="submitComment">
       <div class="form-group">
         <label for="rating">Note</label>
-        <input type="number" class="form-control" id="rating" min="1" max="5" v-model="state.model.rating" required>
+        <input type="number" v-model="newComment.rating" class="form-control" id="rating" min="1" max="5" required>
       </div>
       <div class="form-group">
         <label for="comment">Commentaire</label>
-        <textarea class="form-control" id="comment" v-model="state.model.comment" required></textarea>
+        <textarea v-model="newComment.comment" class="form-control" id="comment" required></textarea>
       </div>
-      <button type="submit" class="btn btn-primary">Soumettre</button>
+      <button type="submit" class="btn btn-primary mt-3">Soumettre</button>
     </form>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, inject } from 'vue'
-import type { AddReviewService, ReviewModel } from '../services/addReviewService'
+import { defineComponent } from 'vue';
+import { useRoute } from 'vue-router';
 
 export default defineComponent({
-  name: "AddReview",
+  name: 'Commentaires',
   setup() {
-    const addReviewService = inject('addReviewService') as AddReviewService
-    const state = reactive({
-      model: {
-        rating: 0,
-        comment: '',
-        scooterId: 1, // exemple statique, vous pouvez passer cet id dynamiquement
-        userId: 1 // exemple statique, vous pouvez passer cet id dynamiquement
-      } as ReviewModel
-    })
-
-    const submitForm = async () => {
-      await addReviewService.addReview(state.model)
-    }
+    const route = useRoute();
+    const scooterId = route.params.scooterId;
+    console.log("Scooter ID:", scooterId);
 
     return {
-      state,
-      submitForm,
-      addReviewService
-    }
+      scooterId
+    };
   },
-})
+  data() {
+    return {
+      commentaires: [
+        { id: 1, user: 'Utilisateur 1', rating: 4, comment: 'Très bien!' },
+        { id: 2, user: 'Utilisateur 2', rating: 5, comment: 'Parfait!' }
+      ],
+      newComment: {
+        rating: 0,
+        comment: ''
+      }
+    };
+  },
+  methods: {
+    submitComment() {
+      const newComment = {
+        id: this.commentaires.length + 1,
+        user: 'Moi',
+        rating: this.newComment.rating,
+        comment: this.newComment.comment
+      };
+      this.commentaires.push(newComment);
+      this.newComment.rating = 0;
+      this.newComment.comment = '';
+    }
+  }
+});
 </script>
 
 <style scoped>
-.review-form {
+.container {
   padding: 2rem;
-  background-color: var(--blue-light);
-  border-radius: 0.5rem;
-}
-
-.btn {
-  margin-top: 2rem;
 }
 </style>

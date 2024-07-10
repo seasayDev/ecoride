@@ -32,9 +32,7 @@
             <li>
                 <router-link v-if="userStore.user" to="/map">deplacement</router-link>
             </li>
-            <li>
-                <router-link v-if="userStore.user" to="/review">Commentaires</router-link>
-            </li>
+            
         </ul>
 
         <span v-if="userStore.user" class="username">{{ getUserName }}</span>

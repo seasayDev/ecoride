@@ -8,7 +8,15 @@
             <h5 class="card-title">{{ scooter.name }}</h5>
             <p class="card-text">{{ scooter.location.name }}</p>
             <button @click="reserve" class="btn btn-primary" :disabled="scooter.qte === 0">Reserver</button>
+            <button @click="showCommentairesModal = true" class="btn btn-secondary">Voir commentaires</button>
+            
         </div>
+
+      <CommentairesModal 
+      :isVisible="showCommentairesModal" 
+      :scooter="scooter" 
+      @close="showCommentairesModal = false" 
+    />
     </div>
 </template>
   
@@ -42,10 +50,11 @@ export default defineComponent({
         return {
             getImageSrc,
             reserve,
-            statusClass
+            statusClass,
         };
     }
 });
+
 </script>
   
 <style scoped>
@@ -86,6 +95,31 @@ export default defineComponent({
 .card-img-top {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
+}
+
+
+
+.scooter-card {
+  padding: 1rem;
+  margin: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  text-align: center;
+}
+.scooter-card img {
+  width: 100%;
+  height: auto;
+}
+.btn-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+.btn {
+  margin: 0.5rem;
+}
+.ml-auto {
+  margin-left: auto;
 }
 </style>
   
