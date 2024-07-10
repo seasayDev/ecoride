@@ -114,16 +114,16 @@ class Database:
         else:
             return userAdd
 
-    def get_reservation_admin(self):
-        cursor = self.get_connection().cursor()
-        cursor.execute("SELECT reservations.id_reservation, reservations.start_date, reservations.end_date," +
-                       "reservations.pick_up_address, reservations.drop_off_address, reservations.total_cost, " +
-                       "trotinette.name AS model, trotinette.category AS category, trotinette.price AS price, users.first_name, users.last_name " +
-                       "FROM reservations " +
-                       "INNER JOIN trotinette ON reservations.trotinette_id = trotinette.id_trotinette " +
-                       "INNER JOIN users ON reservations.user_id = users.id_user;")
-        reservations = cursor.fetchall()
-        return reservations
+    # def get_reservation_admin(self):
+    #     cursor = self.get_connection().cursor()
+    #     cursor.execute("SELECT reservations.id_reservation, reservations.start_date, reservations.end_date," +
+    #                    "reservations.pick_up_address, reservations.drop_off_address, reservations.total_cost, " +
+    #                    "trotinette.name AS model, trotinette.category AS category, trotinette.price AS price, users.first_name, users.last_name " +
+    #                    "FROM reservations " +
+    #                    "INNER JOIN trotinette ON reservations.trotinette_id = trotinette.id_trotinette " +
+    #                    "INNER JOIN users ON reservations.user_id = users.id_user;")
+    #     reservations = cursor.fetchall()
+    #     return reservations
 
     def update_reservation_admin(self, id_reservation, start_date, end_date, total_cost, category):
         cursor = self.get_connection()
@@ -596,4 +596,35 @@ class Database:
                    (user_id, amount, card_id))
         connection.commit()
         return cursor.lastrowid
+    
+    def get_reservations(self, user_id):
+        cursor = self.get_connection().cursor()
+        cursor.execute("""
+        SELECT 
+            reservations.id_reservation, 
+            reservations.start_date, 
+            reservations.end_date,
+            pick_up_location.name AS pick_up_location_name,
+            drop_off_location.name AS drop_off_location_name,
+            reservations.total_cost, 
+            trotinette.name AS model, 
+            trotinette.category AS category, 
+            trotinette.price AS price, 
+            trotinette.image_id AS trotinette_image_id,
+            users.first_name, 
+            users.last_name,
+            users.id_user AS user_id,
+            pictures.data AS image_data
+        FROM reservations 
+        INNER JOIN trotinette ON reservations.trotinette_id = trotinette.id_trotinette 
+        INNER JOIN users ON reservations.user_id = users.id_user
+        INNER JOIN locations AS pick_up_location ON reservations.pick_up_location_id = pick_up_location.id_location
+        INNER JOIN locations AS drop_off_location ON reservations.drop_off_location_id = drop_off_location.id_location
+        LEFT JOIN pictures ON trotinette.image_id = pictures.id_pictures
+        WHERE users.id_user = ?;
+        """, (user_id,))
+        reservations = cursor.fetchall()
+        cursor.close()
+        return reservations
+
         

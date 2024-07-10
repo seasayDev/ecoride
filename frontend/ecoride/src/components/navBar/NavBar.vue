@@ -18,26 +18,31 @@
                 <router-link v-if="userStore.user" to="/payement">Payement</router-link>
             </li> -->
 
-      <li>
-        <router-link v-if="userStore.user" to="/aide">Aide</router-link>
-      </li>
+            <li>
+                <router-link v-if="userStore.user" to="/aide">Aide</router-link>
+            </li>
 
-      <li>
-        <router-link v-if="userStore.user" to="/" @click.prevent="deconnexion"
-          >Deconnexion</router-link
-        >
-      </li>
-      <li>
-        <router-link v-if="userStore.user" to="/admin">Admin</router-link>
-      </li>
-      <li>
-        <router-link v-if="userStore.user" to="/map">deplacement</router-link>
-      </li>
+            <li>
+                <router-link v-if="userStore.user" to="/promotions">Promotions</router-link>
+            </li>
 
-    </ul>
+            <li>
+                <router-link v-if="userStore.user" to="/" @click.prevent="deconnexion">Deconnexion</router-link>
+            </li>
+            <li>
+                <router-link v-if="userStore.user" to="/admin">Admin</router-link>
+            </li>
+            <li>
+                <router-link v-if="userStore.user" to="/map">deplacement</router-link>
+            </li>
+            <li>
+                <router-link v-if="userStore.user" to="/reservations">Reservations</router-link> <!-- New link -->
+            </li>
+        </ul>
 
-    <span v-if="userStore.user" class="username">{{ getUserName }}</span>
-  </nav>
+        <span v-if="userStore.user" class="username">{{ getUserName }}</span>
+
+    </nav>
 </template>
 
 <script lang="ts">

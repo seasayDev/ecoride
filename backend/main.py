@@ -373,6 +373,52 @@ def process_payment():
 
     return jsonify({'message': 'Payment successful', 'payment_id': payment_id}), 200
 
+@app.route('/reservations', methods=['GET'])
+def get_reservations():
+    user_id = request.args.get('user_id')
+
+    if user_id is None:
+        return jsonify({'error': 'User ID is required'}), 400
+
+    try:
+        reservations = get_db().get_reservations(user_id)
+        result = []
+
+        for reservation in reservations:
+            # Base64 encode the image data
+            image_data = base64.b64encode(reservation[13]).decode('utf-8') if reservation[13] else None
+
+            result.append({
+                'id_reservation': reservation[0],
+                'start_date': reservation[1],
+                'end_date': reservation[2],
+                'pick_up_location': {
+                    'name': reservation[3]
+                },
+                'drop_off_location': {
+                    'name': reservation[4]
+                },
+                'total_cost': reservation[5],
+                'trotinette': {
+                    'model': reservation[6],
+                    'category': reservation[7],
+                    'price': reservation[8],
+                    'image': {
+                        'id': reservation[9],
+                        'data': image_data
+                    }
+                },
+                'user': {
+                    'id_user': reservation[12],
+                    'first_name': reservation[10],
+                    'last_name': reservation[11]
+                }
+            })
+
+        return jsonify(result)
+    except Exception as e:
+        app.logger.error(f"Error fetching reservations: {e}")
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 
 if __name__ == "__main__":
