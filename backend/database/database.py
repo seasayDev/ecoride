@@ -559,14 +559,15 @@ class Database:
         return cursor.fetchone()
 
     # Method to create a reservation
-    def create_reservation(self, start_date, end_date, pick_up_address, drop_off_address, total_cost, trotinette_id, user_id, options):
+    def create_reservation(self, start_date, end_date, pick_up_location_id, drop_off_location_id, total_cost, trotinette_id, user_id, options, reservation_hours):
         connection = self.get_connection()
         cursor = connection.cursor()
         cursor.execute(
-            "INSERT INTO reservations (start_date, end_date, pick_up_address, drop_off_address, total_cost, trotinette_id, user_id, options) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            (start_date, end_date, pick_up_address, drop_off_address, total_cost, trotinette_id, user_id, options)
+            "INSERT INTO reservations (start_date, end_date, pick_up_location_id, drop_off_location_id, total_cost, trotinette_id, user_id, options, reservation_hours) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (start_date, end_date, pick_up_location_id, drop_off_location_id, total_cost, trotinette_id, user_id, options, reservation_hours)
         )
         connection.commit()
+        connection.close()
 
     # Method to update trotinette quantity
     def update_trotinette_quantity(self, id_trotinette, new_quantity):
