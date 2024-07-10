@@ -22,9 +22,9 @@
                 <router-link v-if="userStore.user" to="/aide">Aide</router-link>
             </li>
 
-            <li>
+            <!-- <li>
                 <router-link v-if="userStore.user" to="/promotions">Promotions</router-link>
-            </li>
+            </li> -->
 
             <li>
                 <router-link v-if="userStore.user" to="/" @click.prevent="deconnexion">Deconnexion</router-link>
