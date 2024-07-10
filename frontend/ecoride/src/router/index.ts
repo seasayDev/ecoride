@@ -1,3 +1,4 @@
+
 import { createRouter, createWebHistory } from 'vue-router'
 import login from '@/components/login/Login.vue'
 import register from '@/components/register/Register.vue'
@@ -11,6 +12,9 @@ import Aide from '@/components/aide/Aide.vue'
 import Map from '@/components/map/Map.vue'
 import Payement from '@/components/payement/Payement.vue'
 import ReservationDetails from '@/components/reservationDetails/ReservationDetails.vue'
+import ReservationConfirmed from '@/components/reservationDetails/ReservationConfirmed.vue'
+import Promotions from '@/components/promotions/promotion.vue'
+
 
 
 const router = createRouter({
@@ -31,7 +35,7 @@ const router = createRouter({
   
 
   ]
-})
+});
 
 export default router
 
