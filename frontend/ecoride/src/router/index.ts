@@ -1,18 +1,17 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import login from '@/components/login/Login.vue'
-import register from '@/components/register/Register.vue'
-import ResetPassword from '@/components/resetPassword/ResetPassword.vue'
-import Home from '@/components/home/Home.vue'
-import Support from '@/components/support/Support.vue'
-import Profil from '@/components/profil/Profil.vue'
-import EditProfil from '@/components/editProfil/EditProfil.vue'
-import admin from '@/components/admin/admin.vue'
-import Aide from '@/components/aide/Aide.vue'
-import Map from '@/components/map/Map.vue'
-import Payement from '@/components/payement/Payement.vue'
-import ReservationDetails from '@/components/reservationDetails/ReservationDetails.vue'
-import Promotions from '@/components/promotions/promotion.vue'
-
+import { createRouter, createWebHistory } from 'vue-router';
+import login from '@/components/login/Login.vue';
+import register from '@/components/register/Register.vue';
+import ResetPassword from '@/components/resetPassword/ResetPassword.vue';
+import Home from '@/components/home/Home.vue';
+import Support from '@/components/support/Support.vue';
+import Profil from '@/components/profil/Profil.vue';
+import EditProfil from '@/components/editProfil/EditProfil.vue';
+import admin from '@/components/admin/admin.vue';
+import Aide from '@/components/aide/Aide.vue';
+import Map from '@/components/map/Map.vue';
+import Payement from '@/components/payement/Payement.vue';
+import ReservationDetails from '@/components/reservationDetails/ReservationDetails.vue';
+import Promotions from '@/components/promotions/promotion.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,6 +30,6 @@ const router = createRouter({
     { path: '/promotions', name: 'Promotions', component: Promotions, meta: { requiresAuth: true } },
     { path: '/reservation-details', name: 'ReservationDetails', component: ReservationDetails }
   ]
-})
+});
 
-export default router
+export default router;
