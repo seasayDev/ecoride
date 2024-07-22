@@ -43,14 +43,46 @@
     <ProductsModal :isVisible="state.showProductModal" @close="closeModal" :locations="state.locations" />
     <EditProduct :isVisible="state.showEditProduct" @close="closeEditModal" :trotinette="state.productToEdit"
       :locations="state.locations" @update="updateProductsTable" />
-    <DeleteProduct :isVisible="state.isDeleteModalVisible" @close="hideDeleteModal"
-      :trotinette="state.scooterTodelete">
+    <DeleteProduct :isVisible="state.isDeleteModalVisible" @close="hideDeleteModal" :trotinette="state.scooterTodelete">
     </DeleteProduct>
+  </div>
+
+  <!-- New section for reservations -->
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mt-5">
+      <h1>Gestion des Reservations</h1>
+    </div>
+    <table class="table mt-3">
+      <thead>
+        <tr>
+          <th scope="col">ID Reservation</th>
+          <th scope="col">User</th>
+          <th scope="col">Trotinette</th>
+          <th scope="col">Pick Up Location</th>
+          <th scope="col">Drop Off Location</th>
+          <th scope="col">Start Date</th>
+          <th scope="col">End Date</th>
+          <th scope="col">Total Cost</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(reservation, index) in state.allReservations" :key="index">
+          <th scope="row">{{ reservation.id_reservation }}</th>
+          <td>{{ reservation.user.first_name }} {{ reservation.user.last_name }}</td>
+          <td>{{ reservation.trotinette.model }} - {{ reservation.trotinette.category }}</td>
+          <td>{{ reservation.pick_up_location.name }}</td>
+          <td>{{ reservation.drop_off_location.name }}</td>
+          <td>{{ reservation.start_date }}</td>
+          <td>{{ reservation.end_date }}</td>
+          <td>{{ reservation.total_cost }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, onMounted, reactive, ref } from 'vue'
+import { defineComponent, inject, onMounted, reactive } from 'vue'
 import { GetTrotinettes, Trotinette, Location } from './admin'
 import ProductsModal from './modals/ProductsModal.vue';
 import EditProduct from './modals/EditProduct.vue';
@@ -71,12 +103,15 @@ export default defineComponent({
       isDeleteModalVisible: false,
       productToEdit: {} as Trotinette,
       locations: [] as Array<Location>,
-      scooterTodelete: {} as Trotinette
+      scooterTodelete: {} as Trotinette,
+      allReservations: [] as Array<any>
     })
 
     onMounted(async () => {
       state.trotinettes = await trotinettes.getTrotinettes();
       state.locations = await trotinettes.getLocations()
+      state.allReservations = await trotinettes.getAllReservations();
+      console.log(state.allReservations)
     })
 
     const showModalAddProduct = () => {

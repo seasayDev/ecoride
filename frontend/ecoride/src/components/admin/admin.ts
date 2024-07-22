@@ -41,13 +41,11 @@ export interface Newscooter {
   qte: number
 }
 
-
 export class GetTrotinettes {
   private url: string
   constructor(url: string) {
     this.url = url
   }
-
 
   public async getTrotinettes(): Promise<Array<Trotinette>> {
     try {
@@ -83,7 +81,16 @@ export class GetTrotinettes {
   }
   public async deleteScooter(id_trotinette: number): Promise<any> {
     try {
-      const response = await axios.post(this.url + '/deleteScooter', {id: id_trotinette})
+      const response = await axios.post(this.url + '/deleteScooter', { id: id_trotinette })
+      return response.data
+    } catch (error) {
+      return response.error
+    }
+  }
+
+  public async getAllReservations(): Promise<any> {
+    try {
+      const response = await axios.get(this.url + '/get_all_reservations')
       return response.data
     } catch (error) {
       return response.error

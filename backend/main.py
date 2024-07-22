@@ -419,6 +419,43 @@ def get_reservations():
     except Exception as e:
         app.logger.error(f"Error fetching reservations: {e}")
         return jsonify({'error': 'Internal Server Error'}), 500
+    
+
+@app.route('/get_all_reservations', methods=['GET'])
+def get_all_reservations():
+
+    try:
+        reservations = get_db().get_all_reservations()
+        result = []
+
+        for reservation in reservations:
+            result.append({
+                'id_reservation': reservation[0],
+                'start_date': reservation[1],
+                'end_date': reservation[2],
+                'pick_up_location': {
+                    'name': reservation[3]
+                },
+                'drop_off_location': {
+                    'name': reservation[4]
+                },
+                'total_cost': reservation[5],
+                'trotinette': {
+                    'model': reservation[6],
+                    'category': reservation[7],
+                    'price': reservation[8]
+                },
+                'user': {
+                    'id_user': reservation[9],
+                    'first_name': reservation[10],
+                    'last_name': reservation[11]
+                }
+            })
+
+        return jsonify(result)
+    except Exception as e:
+        app.logger.error(f"Error fetching reservations: {e}")
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 
 if __name__ == "__main__":

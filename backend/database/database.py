@@ -627,4 +627,30 @@ class Database:
         cursor.close()
         return reservations
 
+    def get_all_reservations(self):
+        cursor = self.get_connection().cursor()
+        cursor.execute("""
+        SELECT 
+            reservations.id_reservation, 
+            reservations.start_date, 
+            reservations.end_date,
+            pick_up_location.name AS pick_up_location_name,
+            drop_off_location.name AS drop_off_location_name,
+            reservations.total_cost, 
+            trotinette.name AS model, 
+            trotinette.category AS category, 
+            trotinette.price AS price, 
+            users.first_name, 
+            users.last_name,
+            users.id_user AS user_id
+        FROM reservations 
+        INNER JOIN trotinette ON reservations.trotinette_id = trotinette.id_trotinette 
+        INNER JOIN users ON reservations.user_id = users.id_user
+        INNER JOIN locations AS pick_up_location ON reservations.pick_up_location_id = pick_up_location.id_location
+        INNER JOIN locations AS drop_off_location ON reservations.drop_off_location_id = drop_off_location.id_location;
+        """)
+        reservations = cursor.fetchall()
+        cursor.close()
+        return reservations
+
         
