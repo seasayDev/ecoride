@@ -62,7 +62,9 @@
           <th scope="col">Drop Off Location</th>
           <th scope="col">Start Date</th>
           <th scope="col">End Date</th>
+          <th scope="col">Reservation Hours</th>
           <th scope="col">Total Cost</th>
+          <th scope="col">Modifier</th>
         </tr>
       </thead>
       <tbody>
@@ -74,11 +76,22 @@
           <td>{{ reservation.drop_off_location.name }}</td>
           <td>{{ reservation.start_date }}</td>
           <td>{{ reservation.end_date }}</td>
+          <td>{{ reservation.reservation_hours }}</td>
           <td>{{ reservation.total_cost }}</td>
+          <td>
+            <div>
+              <button class="btn btn-info" @click="editReservation(index)"><i class="bi bi-pencil-square"></i></button>
+              <button class="btn btn-danger ms-2" @click="deleteReservation(index)"><i class="bi bi-trash"></i></button>
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
   </div>
+  <EditReservationModal :isVisible="state.showEditReservationModal" @close="closeEditReservationModal"
+    :reservation="state.reservationToEdit" @update="updateReservationsTable" />
+  <DeleteReservationModal :isVisible="state.showDeleteReservationModal" @close="closeDeleteReservationModal"
+    :reservation="state.reservationToDelete" />
 </template>
 
 <script lang="ts">
@@ -87,12 +100,16 @@ import { GetTrotinettes, Trotinette, Location } from './admin'
 import ProductsModal from './modals/ProductsModal.vue';
 import EditProduct from './modals/EditProduct.vue';
 import DeleteProduct from './modals/DeleteProduct.vue';
+import EditReservationModal from './modals/EditReservationModal.vue';
+import DeleteReservationModal from './modals/DeleteReservationModal.vue';
 
 export default defineComponent({
   components: {
     ProductsModal,
     EditProduct,
-    DeleteProduct
+    DeleteProduct,
+    EditReservationModal,
+    DeleteReservationModal
   },
   setup() {
     const trotinettes = inject('getTrotinettes') as GetTrotinettes
@@ -104,7 +121,11 @@ export default defineComponent({
       productToEdit: {} as Trotinette,
       locations: [] as Array<Location>,
       scooterTodelete: {} as Trotinette,
-      allReservations: [] as Array<any>
+      allReservations: [] as Array<any>,
+      reservationToEdit: {} as any,
+      showEditReservationModal: false,
+      showDeleteReservationModal: false,
+      reservationToDelete: {} as any
     })
 
     onMounted(async () => {
@@ -145,6 +166,31 @@ export default defineComponent({
       state.trotinettes = await trotinettes.getTrotinettes();
       state.locations = await trotinettes.getLocations()
     }
+
+    const editReservation = (index: number) => {
+      state.reservationToEdit = state.allReservations[index];
+      state.showEditReservationModal = true;
+    };
+
+    const closeEditReservationModal = () => {
+      state.showEditReservationModal = false;
+      updateReservationsTable();
+    };
+
+    const deleteReservation = (index: number) => {
+      state.reservationToDelete = state.allReservations[index];
+      state.showDeleteReservationModal = true;
+    };
+
+    const closeDeleteReservationModal = () => {
+      state.showDeleteReservationModal = false;
+      updateReservationsTable();
+    };
+
+    const updateReservationsTable = async () => {
+      state.allReservations = await trotinettes.getAllReservations();
+    };
+
     return {
       trotinettes,
       state,
@@ -155,7 +201,12 @@ export default defineComponent({
       getImageSrc,
       deleteProduct,
       updateProductsTable,
-      hideDeleteModal
+      hideDeleteModal,
+      editReservation,
+      closeEditReservationModal,
+      deleteReservation,
+      closeDeleteReservationModal,
+      updateReservationsTable
     }
   },
 })

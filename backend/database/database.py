@@ -634,6 +634,7 @@ class Database:
             reservations.id_reservation, 
             reservations.start_date, 
             reservations.end_date,
+            reservations.reservation_hours,
             pick_up_location.name AS pick_up_location_name,
             drop_off_location.name AS drop_off_location_name,
             reservations.total_cost, 
@@ -652,5 +653,21 @@ class Database:
         reservations = cursor.fetchall()
         cursor.close()
         return reservations
+    
+    def delete_reservation_by_id(self, reservation_id):
+        connection = self.get_connection()
+        cursor = connection.cursor()
+        try:
+            cursor.execute("DELETE FROM reservations WHERE id_reservation = ?", (reservation_id,))
+            connection.commit()
+            return True
+        except Exception as e:
+            connection.rollback()
+            print(f"Error deleting reservation: {e}")
+            return False
+        finally:
+            cursor.close()
+
+
 
         

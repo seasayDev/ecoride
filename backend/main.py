@@ -433,28 +433,55 @@ def get_all_reservations():
                 'id_reservation': reservation[0],
                 'start_date': reservation[1],
                 'end_date': reservation[2],
+                'reservation_hours' : reservation[3],
                 'pick_up_location': {
-                    'name': reservation[3]
-                },
-                'drop_off_location': {
                     'name': reservation[4]
                 },
-                'total_cost': reservation[5],
+                'drop_off_location': {
+                    'name': reservation[5]
+                },
+                'total_cost': reservation[6],
                 'trotinette': {
-                    'model': reservation[6],
-                    'category': reservation[7],
-                    'price': reservation[8]
+                    'model': reservation[7],
+                    'category': reservation[8],
+                    'price': reservation[9]
                 },
                 'user': {
-                    'id_user': reservation[9],
-                    'first_name': reservation[10],
-                    'last_name': reservation[11]
+                    'id_user': reservation[10],
+                    'first_name': reservation[11],
+                    'last_name': reservation[12]
                 }
             })
 
         return jsonify(result)
     except Exception as e:
         app.logger.error(f"Error fetching reservations: {e}")
+        return jsonify({'error': 'Internal Server Error'}), 500
+    
+@app.route('/delete_reservation', methods=['DELETE'])
+def delete_reservation():
+    try:
+        # Get reservation ID from the request arguments
+        reservation_id = request.args.get('id_reservation')
+        print("ID RESERVATION "+reservation_id)
+        if not reservation_id:
+            return jsonify({'error': 'Reservation ID is required'}), 400
+        
+        # Convert reservation_id to integer
+        try:
+            reservation_id = int(reservation_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid reservation ID'}), 400
+
+        # Call the delete function
+        result = get_db().delete_reservation_by_id(reservation_id)
+        
+        if result:
+            return jsonify({'message': 'Reservation deleted successfully'}), 200
+        else:
+            return jsonify({'error': 'Failed to delete reservation'}), 500
+    except Exception as e:
+        app.logger.error(f"Error deleting reservation: {e}")
         return jsonify({'error': 'Internal Server Error'}), 500
 
 

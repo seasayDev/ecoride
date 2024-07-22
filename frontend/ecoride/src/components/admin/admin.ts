@@ -96,4 +96,14 @@ export class GetTrotinettes {
       return response.error
     }
   }
+  public async deleteReservation(id_reservation: number): Promise<any> {
+    try {
+      const response = await axios.delete(this.url + '/delete_reservation', {
+        params: { id_reservation }
+      })
+      return response.data
+    } catch (error) {
+      return error.response.data
+    }
+  }
 }
