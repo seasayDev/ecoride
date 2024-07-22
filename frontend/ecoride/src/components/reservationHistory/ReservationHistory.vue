@@ -9,25 +9,19 @@
         </div>
         <div v-if="reservations.length > 0" class="list-group">
             <div v-for="reservation in reservations" :key="reservation.id_reservation"
-                class="list-group-item mb-3 reservation-card">
-                <div class="reservation-summary">
-                    <p class="mb-2"><strong>Start Date:</strong> {{ reservation.start_date }}</p>
-                    <p class="mb-2"><strong>End Date:</strong> {{ reservation.end_date }}</p>
-                    <p class="mb-2"><strong>Pick-up Location:</strong> {{ reservation.pick_up_location.name }}</p>
-                    <p class="mb-2"><strong>Drop-off Location:</strong> {{ reservation.drop_off_location.name }}</p>
-                    <p class="mb-2"><strong>Total Cost:</strong> ${{ reservation.total_cost }}</p>
-                    <img v-if="reservation.trotinette.image.data" :src="getImageSrc(reservation.trotinette.image.data)"
-                        alt="Trotinette Image" class="img-thumbnail mb-3 trotinette-image" />
+                class="reservation-container">
+                <div class="list-group-item mb-3 reservation-card">
+                    <div class="reservation-summary">
+                        <p class="mb-2"><strong>Start Date:</strong> {{ reservation.start_date }}</p>
+                        <p class="mb-2"><strong>End Date:</strong> {{ reservation.end_date }}</p>
+                        <p class="mb-2"><strong>Pick-up Location:</strong> {{ reservation.pick_up_location.name }}</p>
+                        <p class="mb-2"><strong>Drop-off Location:</strong> {{ reservation.drop_off_location.name }}</p>
+                        <p class="mb-2"><strong>Total Cost:</strong> ${{ reservation.total_cost }}</p>
+                        <img v-if="reservation.trotinette.image.data" :src="getImageSrc(reservation.trotinette.image.data)"
+                            alt="Trotinette Image" class="img-thumbnail mb-3 trotinette-image" />
+                    </div>
                 </div>
-                <div class="reservation-advanced">
-                    <h6 class="mb-2"><strong>Trotinette Details:</strong></h6>
-                    <p class="mb-2"><strong>Model:</strong> {{ reservation.trotinette.model }}</p>
-                    <p class="mb-2"><strong>Category:</strong> {{ reservation.trotinette.category }}</p>
-                    <p class="mb-2"><strong>Price:</strong> ${{ reservation.trotinette.price }}</p>
-                    <h6 class="mb-2"><strong>User Details:</strong></h6>
-                    <p class="mb-2"><strong>Name:</strong> {{ reservation.user.first_name }} {{ reservation.user.last_name
-                    }}</p>
-                </div>
+                <button @click="pay(reservation)" class="btn btn-primary mt-3">Pay</button>
             </div>
         </div>
         <div v-else class="alert alert-info" role="alert">
@@ -38,8 +32,9 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, inject } from 'vue';
+import { useRouter } from 'vue-router';
 import { Reservation, ReservationsService } from './reservationsService';
-import { userStore, setUser, getUserFromStorage } from "@/components/helpers/userSession";
+import { userStore, getUserFromStorage } from "@/components/helpers/userSession";
 
 export default defineComponent({
     name: 'ReservationHistory',
@@ -47,6 +42,7 @@ export default defineComponent({
         const reservations = ref<Reservation[]>([]);
         const loading = ref<boolean>(true);
         const error = ref<string | null>(null);
+        const router = useRouter();
 
         const reservationsService = inject<ReservationsService>('ReservationsHistoryService');
         if (!reservationsService) {
@@ -68,6 +64,21 @@ export default defineComponent({
             return `data:image/webp;base64,${imageData}`;
         };
 
+        const pay = (reservation: Reservation) => {
+            router.push({
+                name: 'ReservationDetails',
+                query: {
+                    reservationId: reservation.id_reservation,
+                    trotinette: JSON.stringify(reservation.trotinette),
+                    reservationDate: reservation.start_date,
+                    reservationTime: reservation.start_date,
+                    reservationDuration: (new Date(reservation.end_date).getTime() - new Date(reservation.start_date).getTime()) / (1000 * 60 * 60),
+                    dropOutLocation: reservation.drop_off_location.name,
+                    totalCost: reservation.total_cost
+                }
+            });
+        };
+
         onMounted(() => {
             getUserFromStorage();
             const userId = userStore.user?.session.id_user;
@@ -78,7 +89,8 @@ export default defineComponent({
             reservations,
             loading,
             error,
-            getImageSrc
+            getImageSrc,
+            pay
         };
     },
 });
@@ -107,6 +119,10 @@ export default defineComponent({
     object-fit: cover;
 }
 
+.reservation-container {
+    margin-bottom: 20px;
+}
+
 .reservation-card {
     position: relative;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -133,5 +149,9 @@ export default defineComponent({
     padding: 10px;
     z-index: 10;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+    margin-top: 10px;
 }
 </style>

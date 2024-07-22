@@ -9,7 +9,6 @@ import string
 import secrets
 from bcrypt import hashpw, gensalt, checkpw
 from datetime import datetime
-from bcrypt import hashpw, gensalt,checkpw
 import base64
 
 app = Flask(__name__)
@@ -30,12 +29,12 @@ app.config['MAIL_USE_TLS'] = True
 mail = Mail(app)
 
 
-
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
         g._database = Database()
     return g._database
+
 
 @app.route('/register', methods=['POST'])
 def inscription():
@@ -55,10 +54,11 @@ def inscription():
     salt = uuid.uuid4().hex
     hashed_password = hashpw((data['password'] + salt).encode('utf-8'), gensalt()).decode('utf-8')
     get_db().create_user(data['firstName'], data['lastName'], data['email'], data['birthdate'], data['phone'],
-                         data['address'], data['country'], data['city'], data['province'], 
+                         data['address'], data['country'], data['city'], data['province'],
                          data['postalCode'], salt, hashed_password)
-    
+
     return jsonify({"message": "Registration successful!"}), 201
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -77,7 +77,7 @@ def login():
         id_session = uuid.uuid4().hex
         get_db().save_session(id_session, username, fname, role)
         session_user = {
-            'id': id_session, 
+            'id': id_session,
             'email': email,
             'fname': fname,
             'role': role,
@@ -87,12 +87,14 @@ def login():
     else:
         return jsonify({"error": "Invalid password"}), 401
 
+
 @app.route('/logout', methods=['POST'])
 def deconnexion():
     data = request.get_json()
     id_session = data.get('id')
     get_db().delete_session(id_session)
     return jsonify({'message': 'User logged out'}), 201
+
 
 @app.route('/resetPassword', methods=['POST'])
 def resetPassword():
@@ -101,7 +103,7 @@ def resetPassword():
         email = data.get('email')
         user_id = get_db().get_user_id_by_email(email)
         if not user_id:
-            return jsonify({'error':'user does not exist'}),400
+            return jsonify({'error': 'user does not exist'}), 400
         alphabet = string.ascii_letters + string.digits + string.punctuation
         password = ''.join(secrets.choice(alphabet) for i in range(10))
         salt = uuid.uuid4().hex
@@ -114,17 +116,20 @@ def resetPassword():
                           sender=sender, recipients=[recipient])
         message.html = render_template('reset_password_confirmation.html', password=password)
         mail.send(message)
-        return jsonify({'message':"email reset sended"}), 201
+        return jsonify({'message': "email reset sent"}), 201
     except Exception as e:
-        return jsonify({'message':'Failed to send email'}),500
+        return jsonify({'message': 'Failed to send email'}), 500
+
 
 @app.route('/', methods=['GET'])
 def greetings():
-    return ("hello INF6150")
+    return "hello INF6150"
+
 
 @app.route('/support', methods=['GET'])
 def support_page():
     return render_template('support.html')
+
 
 @app.route('/support', methods=['POST'])
 def submit_support_request():
@@ -137,6 +142,7 @@ def submit_support_request():
         return jsonify({'error': 'Missing data'}), 400
 
     return jsonify({'message': 'Support request received successfully'})
+
 
 @app.route('/getTrotinettes', methods=['GET'])
 def get_trotinettes():
@@ -153,16 +159,16 @@ def get_trotinettes():
             'location': {
                 'id': row[5],
                 'name': row[8],
-                'id_address':row[9]
+                'id_address': row[9]
             },
             'address': {
-                    'id': row[9],
-                    'address': row[10],
-                    'country': row[11],
-                    'city': row[12],
-                    'province': row[13],
-                    'postal_code': row[14]
-                },
+                'id': row[9],
+                'address': row[10],
+                'country': row[11],
+                'city': row[12],
+                'province': row[13],
+                'postal_code': row[14]
+            },
             'image': {
                 'id': row[6],
                 'data': image_data
@@ -172,6 +178,7 @@ def get_trotinettes():
         trotinettes.append(trotinette)
 
     return jsonify(trotinettes)
+
 
 @app.route('/getLocations', methods=['GET'])
 def get_locations():
@@ -185,6 +192,7 @@ def get_locations():
         }
         locations.append(location)
     return jsonify(locations)
+
 
 @app.route('/reserveTrotinette', methods=['POST'])
 def reserve_trotinette():
@@ -207,22 +215,10 @@ def reserve_trotinette():
     db.create_reservation(start_date, end_date, pick_up_address, drop_off_address, total_cost, trotinette_id, user_id, options)
     db.update_trotinette_quantity(trotinette_id, trotinette['qte'] - 1)
 
-    user = db.get_user_by_id(user_id)
-    recipient = user['email']
-    sender = email_settings['email']['sender']
-    message = Message(subject='Reservation Confirmation',
-                      sender=sender, recipients=[recipient])
-    message.html = render_template('reservation_confirmation.html', 
-                                   start_date=start_date, 
-                                   end_date=end_date, 
-                                   total_cost=total_cost,
-                                   pick_up_address=pick_up_address,
-                                   drop_off_address=drop_off_address)
-    mail.send(message)
+    return jsonify({'message': 'Reservation stored successfully'}), 201
 
-    return jsonify({'message': 'Reservation successful'}), 201
 
-@app.route('/createScooter',methods=['POST'])
+@app.route('/createScooter', methods=['POST'])
 def create_scooter():
     try:
         data = request.get_json()
@@ -233,17 +229,18 @@ def create_scooter():
         location_id = data.get('location', {}).get('id_location')
         image_data = data.get('image', {}).get('data')
         qte = data.get('qte')
-        # print(name,category,price,location_id,qte,image_data)
+        # print(name, category, price, location_id, qte, image_data)
         if not (name and category and price and location_id and qte is not None):
             return jsonify({'error': 'Missing required fields'}), 400
         image_id = str(uuid.uuid4().hex)
         file_data = base64.b64decode(image_data) if image_data else None
         get_db().create_trotinette(name, category, price, available, location_id, image_id, qte, file_data)
-        return jsonify({'message':"sccoter added"}), 201
+        return jsonify({'message': "scooter added"}), 201
     except Exception as e:
         return jsonify({'error': 'An error occurred while processing your request'}), 500
 
-@app.route('/updateScooter',methods=['PUT'])
+
+@app.route('/updateScooter', methods=['PUT'])
 def update_scooter():
     try:
         data = request.get_json()
@@ -261,7 +258,7 @@ def update_scooter():
         file_data = base64.b64decode(image_data) if image_data else None
         if not image_id:
             image_id = str(uuid.uuid4().hex)
-            get_db().create_picture(image_id,file_data)
+            get_db().create_picture(image_id, file_data)
         # Print for debugging
         # print(id_trotinette, name, category, price, available, location_id, image_id, qte)
 
@@ -276,7 +273,7 @@ def update_scooter():
 @app.route('/profil', methods=['GET'])
 def get_user():
     id_user = request.args.get('id_user')
-    
+
     if not id_user:
         return jsonify({"error": "User not logged in"}), 401
 
@@ -290,6 +287,7 @@ def get_user():
         return jsonify({"error": "User not found"}), 404
 
     return jsonify(profil), 200
+
 
 @app.route('/editProfil', methods=['PUT'])
 def edit_user():
@@ -313,12 +311,12 @@ def edit_user():
     return jsonify({"message": "Profile updated successfully!"}), 200
 
 
-@app.route('/deleteScooter',methods=['POST'])
+@app.route('/deleteScooter', methods=['POST'])
 def delete_scooter():
-    data =request.get_json()
+    data = request.get_json()
     id_trotinette = data.get('id')
     get_db().delete_trotinette(id_trotinette)
-    return jsonify({'message':'scooter is deleted '}),200
+    return jsonify({'message': 'scooter is deleted '}), 200
 
 
 @app.route('/process-payment', methods=['POST'])
@@ -330,18 +328,8 @@ def process_payment():
     card_name = data.get('cardName')
     amount = data.get('amount')  # Future amount of the cart
     user_id = data.get('user_id')
-    
-    reservation_date = data.get('reservationDate')
-    reservation_duration = data.get('reservationDuration')
-    reservation_time = data.get('reservationTime')
-    total_cost = data.get('totalCost')
-    
-    trotinette = data.get('trotinette')
-    trotinette_id = trotinette.get('id_trotinette')
-    location = trotinette.get('location')
-    pick_up_location_id = location.get('id')
-    dropOutLocation = data.get('dropOutLocation')
-  
+
+    reservation_id = data.get('reservation_id')
 
     db = get_db()
     card = db.get_credit_card(card_number)
@@ -355,23 +343,11 @@ def process_payment():
     # Process payment
     payment_id = db.add_payment_history(user_id, amount, card[0])
 
-    # Create reservation
-    end_date = reservation_date  # Start date and end date are the same for the reservation
-    reservation_hours = reservation_duration  # Reservation duration
-
-    db.create_reservation(
-        start_date=reservation_date,
-        end_date=end_date,
-        pick_up_location_id=pick_up_location_id,
-        drop_off_location_id=dropOutLocation, 
-        total_cost=total_cost,
-        trotinette_id=trotinette_id,
-        user_id=user_id,
-        options=None,  # Assuming no additional options
-        reservation_hours=reservation_hours
-    )
+    # Update reservation with payment info
+    db.update_reservation_payment(reservation_id, payment_id)
 
     return jsonify({'message': 'Payment successful', 'payment_id': payment_id}), 200
+
 
 @app.route('/reservations', methods=['GET'])
 def get_reservations():

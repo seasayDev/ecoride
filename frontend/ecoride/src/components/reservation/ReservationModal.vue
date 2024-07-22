@@ -1,4 +1,5 @@
 <template>
+  <!-- Modal content remains the same -->
   <div class="modal" id="reservationModal" tabindex="-1" role="dialog" aria-labelledby="reservationModalLabel"
     aria-hidden="true" v-if="isVisible">
     <div class="modal-dialog" role="document">
@@ -75,7 +76,6 @@ import { Trotinette } from '../scooterCard';
 import { userStore, getUserFromStorage } from "@/components/helpers/userSession";
 import { Location, Newscooter, GetTrotinettes } from '../admin';
 
-
 export default defineComponent({
   props: {
     isVisible: {
@@ -128,20 +128,30 @@ export default defineComponent({
       currentStep.value = 'form';
     };
 
-    const confirmReservation = () => {
+    const confirmReservation = async () => {
       const reservationDetails = {
-        trotinette: props.trotinette,
+        trotinette_id: props.trotinette.id_trotinette,
         user_id: userStore.user?.session.id_user,
-        reservationDate: reservationDate.value,
-        reservationTime: state.reservationTime,
-        reservationDuration: reservationDuration.value,
-        dropOutLocation: state.dropOutLocation.id_location,
-        dropOutName: state.dropOutLocation.name,
-        totalCost: costToshow.value,
+        start_date: reservationDate.value + ' ' + state.reservationTime,
+        end_date: reservationDate.value + ' ' + state.reservationTime, // Assuming the end time is the same as start time plus duration
+        pick_up_address: props.trotinette.location.id,
+        drop_off_address: state.dropOutLocation.id_location,
       };
 
-      localStorage.setItem('reservationDetails', JSON.stringify(reservationDetails));
-      router.push({ name: 'ReservationDetails' });
+      try {
+        await fetch('http://localhost:5000/reserveTrotinette', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(reservationDetails),
+        });
+
+        localStorage.setItem('reservationDetails', JSON.stringify(reservationDetails));
+        router.push({ name: 'ReservationHistory' });
+      } catch (error) {
+        console.error('Error confirming reservation:', error);
+      }
     };
 
     const today = computed(() => {
