@@ -7,27 +7,32 @@
         <div v-if="error" class="alert alert-danger" role="alert">
             {{ error }}
         </div>
+        <div v-if="successMessage" class="alert alert-success" role="alert">
+            {{ successMessage }}
+        </div>
         <div v-if="reservations.length > 0" class="list-group">
-            <div v-for="reservation in reservations" :key="reservation.id_reservation"
-                class="list-group-item mb-3 reservation-card">
-                <div class="reservation-summary">
-                    <p class="mb-2"><strong>Start Date:</strong> {{ reservation.start_date }}</p>
-                    <p class="mb-2"><strong>End Date:</strong> {{ reservation.end_date }}</p>
-                    <p class="mb-2"><strong>Pick-up Location:</strong> {{ reservation.pick_up_location.name }}</p>
-                    <p class="mb-2"><strong>Drop-off Location:</strong> {{ reservation.drop_off_location.name }}</p>
-                    <p class="mb-2"><strong>Total Cost:</strong> ${{ reservation.total_cost }}</p>
-                    <img v-if="reservation.trotinette.image.data" :src="getImageSrc(reservation.trotinette.image.data)"
-                        alt="Trotinette Image" class="img-thumbnail mb-3 trotinette-image" />
+            <div v-for="reservation in reservations" :key="reservation.id_reservation">
+                <div class="list-group-item mb-3 reservation-card">
+                    <div class="reservation-summary">
+                        <p class="mb-2"><strong>Start Date:</strong> {{ reservation.start_date }}</p>
+                        <p class="mb-2"><strong>End Date:</strong> {{ reservation.end_date }}</p>
+                        <p class="mb-2"><strong>Pick-up Location:</strong> {{ reservation.pick_up_location.name }}</p>
+                        <p class="mb-2"><strong>Drop-off Location:</strong> {{ reservation.drop_off_location.name }}</p>
+                        <p class="mb-2"><strong>Total Cost:</strong> ${{ reservation.total_cost }}</p>
+                        <img v-if="reservation.trotinette.image.data" :src="getImageSrc(reservation.trotinette.image.data)"
+                            alt="Trotinette Image" class="img-thumbnail mb-3 trotinette-image" />
+                    </div>
+                    <div class="reservation-advanced">
+                        <h6 class="mb-2"><strong>Trotinette Details:</strong></h6>
+                        <p class="mb-2"><strong>Model:</strong> {{ reservation.trotinette.model }}</p>
+                        <p class="mb-2"><strong>Category:</strong> {{ reservation.trotinette.category }}</p>
+                        <p class="mb-2"><strong>Price:</strong> ${{ reservation.trotinette.price }}</p>
+                        <h6 class="mb-2"><strong>User Details:</strong></h6>
+                        <p class="mb-2"><strong>Name:</strong> {{ reservation.user.first_name }} {{ reservation.user.last_name
+                        }}</p>
+                    </div>
                 </div>
-                <div class="reservation-advanced">
-                    <h6 class="mb-2"><strong>Trotinette Details:</strong></h6>
-                    <p class="mb-2"><strong>Model:</strong> {{ reservation.trotinette.model }}</p>
-                    <p class="mb-2"><strong>Category:</strong> {{ reservation.trotinette.category }}</p>
-                    <p class="mb-2"><strong>Price:</strong> ${{ reservation.trotinette.price }}</p>
-                    <h6 class="mb-2"><strong>User Details:</strong></h6>
-                    <p class="mb-2"><strong>Name:</strong> {{ reservation.user.first_name }} {{ reservation.user.last_name
-                    }}</p>
-                </div>
+                <button class="btn btn-primary mt-3" @click="deverrouiller(reservation.id_reservation)">Deverrouiller</button>
             </div>
         </div>
         <div v-else class="alert alert-info" role="alert">
@@ -38,6 +43,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, inject } from 'vue';
+import axios from 'axios';
 import { Reservation, ReservationsService } from './reservationsService';
 import { userStore, setUser, getUserFromStorage } from "@/components/helpers/userSession";
 
@@ -47,6 +53,7 @@ export default defineComponent({
         const reservations = ref<Reservation[]>([]);
         const loading = ref<boolean>(true);
         const error = ref<string | null>(null);
+        const successMessage = ref<string | null>(null);
 
         const reservationsService = inject<ReservationsService>('ReservationsHistoryService');
         if (!reservationsService) {
@@ -56,7 +63,7 @@ export default defineComponent({
         const fetchReservations = async (userId: number) => {
             try {
                 reservations.value = await reservationsService.getReservations(userId);
-                console.log(reservations.value)
+                console.log(reservations.value);
             } catch (err) {
                 error.value = 'Failed to fetch reservations';
             } finally {
@@ -66,6 +73,21 @@ export default defineComponent({
 
         const getImageSrc = (imageData: string) => {
             return `data:image/webp;base64,${imageData}`;
+        };
+
+        const deverrouiller = async (id_reservation: number) => {
+            try {
+                const response = await axios.post('http://localhost:5000/unlockTrotinette', { id_reservation });
+                if (response.status === 200) {
+                    successMessage.value = response.data.message;
+                    // Remove the reservation from the list
+                    reservations.value = reservations.value.filter(reservation => reservation.id_reservation !== id_reservation);
+                } else {
+                    throw new Error('Failed to unlock trotinette');
+                }
+            } catch (error) {
+                error.value = 'Failed to unlock trotinette';
+            }
         };
 
         onMounted(() => {
@@ -78,7 +100,9 @@ export default defineComponent({
             reservations,
             loading,
             error,
-            getImageSrc
+            successMessage,
+            getImageSrc,
+            deverrouiller,
         };
     },
 });

@@ -419,6 +419,24 @@ def get_reservations():
     except Exception as e:
         app.logger.error(f"Error fetching reservations: {e}")
         return jsonify({'error': 'Internal Server Error'}), 500
+    
+
+@app.route('/unlockTrotinette', methods=['POST'])
+def unlock_trotinette():
+    data = request.get_json()
+    id_reservation = data.get('id_reservation')
+
+    if not id_reservation:
+        return jsonify({'error': 'Reservation ID is required'}), 400
+
+    db = get_db()
+    try:
+        db.delete_reservation(id_reservation)
+        return jsonify({'message': 'Trotinette deverrouiller avec succès'}), 200
+    except Exception as e:
+        app.logger.error(f"Error unlocking trotinette: {e}")
+        return jsonify({'error': 'Internal Server Error'}), 500
+
 
 # Logique facturation
 @app.route('/facturation', methods=['POST'])
