@@ -10,46 +10,44 @@
       <li>
         <router-link v-if="userStore.user" to="/support">Support</router-link>
       </li>
-      <li>
-        <router-link v-if="userStore.user" to="/profil">Profil</router-link>
+
+      <li class="dropdown" v-if="userStore.user">
+        <a href="javascript:void(0)" class="dropbtn">Mon compte</a>
+        <div class="dropdown-content">
+          <router-link to="/profil">Modifier Profil</router-link>
+          <router-link to="/facturation">Modifier Facturation</router-link>
+        </div>
       </li>
 
-      <!-- <li>
-                <router-link v-if="userStore.user" to="/payement">Payement</router-link>
-            </li> -->
+      <li>
+        <router-link v-if="userStore.user" to="/aide">Aide</router-link>
+      </li>
 
-            <li>
-                <router-link v-if="userStore.user" to="/aide">Aide</router-link>
-            </li>
 
-            <!-- <li>
-                <router-link v-if="userStore.user" to="/promotions">Promotions</router-link>
-            </li> -->
+      <li>
+        <router-link v-if="userStore.user" to="/" @click.prevent="deconnexion">Deconnexion</router-link>
+      </li>
+      <li>
+        <router-link v-if="userStore.user" to="/admin">Admin</router-link>
+      </li>
+      <li>
+        <router-link v-if="userStore.user" to="/map">deplacement</router-link>
+      </li>
+      <li>
+        <router-link v-if="userStore.user" to="/reservations">Reservations</router-link>
+      </li>
+    </ul>
 
-            <li>
-                <router-link v-if="userStore.user" to="/" @click.prevent="deconnexion">Deconnexion</router-link>
-            </li>
-            <li>
-                <router-link v-if="userStore.user" to="/admin">Admin</router-link>
-            </li>
-            <li>
-                <router-link v-if="userStore.user" to="/map">deplacement</router-link>
-            </li>
-            <li>
-                <router-link v-if="userStore.user" to="/reservations">Reservations</router-link> <!-- New link -->
-            </li>
-        </ul>
-
-        <span v-if="userStore.user" class="username">{{ getUserName }}</span>
-
-    </nav>
+    <span v-if="userStore.user" class="username">{{ getUserName }}</span>
+  </nav>
 </template>
 
 <script lang="ts">
 import { useRouter } from 'vue-router'
-import { defineComponent, onMounted, reactive, watch, inject, computed } from 'vue'
+import { defineComponent, reactive, computed, inject } from 'vue'
 import { userStore, setUser, getUserFromStorage } from '@/components/helpers/userSession'
 import { LoginUser } from '../login'
+
 export default defineComponent({
   name: 'NavBar',
   setup() {
@@ -99,6 +97,7 @@ ul {
 
 li {
   display: inline;
+  position: relative;
 }
 
 a {
@@ -115,5 +114,55 @@ a:hover {
   color: white;
   right: 33px;
   top: 16px;
+}
+
+/* Dropdown styles */
+.dropdown .dropbtn {
+  cursor: pointer;
+  color: white;
+  text-decoration: none;
+  background-color: #333;
+  border: none;
+  padding: 0;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown:hover .dropbtn {
+  background-color: #3e8e41;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 600px) {
+  ul {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .dropdown-content {
+    position: static;
+  }
 }
 </style>

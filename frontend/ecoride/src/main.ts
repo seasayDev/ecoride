@@ -47,6 +47,9 @@ import { GetTrotinettes } from './components/admin/admin'
 import { SupportService } from '@/components/support/support'
 import { PaymentService } from '@/components/payement/payement'
 import { ReservationsService } from './components/reservationHistory/reservationsService'
+import { FacturationService } from '@/components/facturation/facturation'
+
+
 
 const app = createApp(App)
 const backURL = 'http://127.0.0.1:5000' // back end url to send api requests
@@ -65,4 +68,5 @@ app.provide('getTrotinettes', new GetTrotinettes(backURL))
 app.provide('supportService', new SupportService(backURL + '/support'))
 app.provide('paymentService', new PaymentService(backURL + '/process-payment'))
 app.provide('ReservationsHistoryService', new ReservationsService(`${backURL}/reservations`))
+app.provide('facturationService', new FacturationService(backURL))
 app.mount('#app')
