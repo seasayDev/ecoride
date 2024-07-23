@@ -40,7 +40,15 @@ export class ReservationsService {
       return response.data
     } catch (error) {
       console.error('Error fetching reservations:', error)
-      throw error
+      throw error;
+    }
+  }
+  public async cancelReservation(reservationId: number): Promise<void> {
+    try {
+      await axios.delete(`${this.url}/${reservationId}`);
+    } catch (error) {
+      console.error('Error canceling reservation:', error);
+      throw new Error('Failed to cancel reservation');
     }
   }
 }

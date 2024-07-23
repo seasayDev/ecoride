@@ -120,13 +120,13 @@ CREATE TABLE IF NOT EXISTS payment_history (
     FOREIGN KEY (card_id) REFERENCES credit_cards (id)
 );
 
--- -- Insert sample values
--- INSERT INTO credit_cards (card_number, expiry_date, cvv, card_holder_name, user_id)
--- VALUES 
--- -- ('1234567890123456', '12/25', '123', 'John Doe', 1),
--- -- ('9876543210987654', '06/24', '456', 'Jane Smith', 2),
--- -- ('1111222233334444', '09/23', '789', 'Alice Johnson', 3),
--- -- ('4444444444444444', '01/24', '789', 'Alice test1', 4),
--- -- ('5555555555555555', '01/25', '789', 'Alice test2', 5);
+-- Insert sample values
+ INSERT INTO credit_cards (card_number, expiry_date, cvv, card_holder_name, user_id)
+VALUES 
+ ('4234567890123456', '12/25', '123', 'John Doe', 1),
+-- ('9876543210987654', '06/24', '456', 'Jane Smith', 2),
+-- ('1111222233334444', '09/23', '789', 'Alice Johnson', 3),
+ ('4444444444444444', '01/24', '789', 'Alice test1', 4),
+ ('5555555555555555', '01/25', '789', 'Alice test2', 5);
 
 
