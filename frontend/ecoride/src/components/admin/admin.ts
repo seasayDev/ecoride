@@ -106,4 +106,12 @@ export class GetTrotinettes {
       return error.response.data
     }
   }
+  public async updateReservation(reservation: any): Promise<any> {
+    try {
+      const response = await axios.put(this.url + '/update_reservation', reservation)
+      return response.data
+    } catch (error) {
+      return error.response.data
+    }
+  }
 }

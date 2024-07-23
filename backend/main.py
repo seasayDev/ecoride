@@ -483,6 +483,30 @@ def delete_reservation():
     except Exception as e:
         app.logger.error(f"Error deleting reservation: {e}")
         return jsonify({'error': 'Internal Server Error'}), 500
+    
+@app.route('/update_reservation', methods=['PUT'])
+def update_reservation():
+    try:
+        data = request.json
+        
+        reservation_id = data.get('id_reservation')
+        start_date = data.get('start_date')
+        end_date = data.get('end_date')
+        reservation_hours = data.get('reservation_hours')
+        total_cost = data.get('total_cost')
+
+        if not all([reservation_id, start_date, end_date, reservation_hours, total_cost]):
+            return jsonify({'error': 'Missing fields'}), 400
+
+        result = get_db().update_reservation(reservation_id, start_date, end_date, reservation_hours, total_cost)
+        
+        if result:
+            return jsonify({'message': 'Reservation updated successfully'}), 200
+        else:
+            return jsonify({'error': 'Failed to update reservation'}), 500
+    except Exception as e:
+        app.logger.error(f"Error updating reservation: {e}")
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 
 if __name__ == "__main__":

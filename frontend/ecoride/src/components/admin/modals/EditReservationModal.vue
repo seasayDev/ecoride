@@ -7,36 +7,34 @@
                     <div class="col-md-4">
                         <label for="firstName" class="form-label">User First Name</label>
                         <input type="text" class="form-control" id="firstName" v-model="state.reservation.user.first_name"
-                            placeholder="Enter First Name" required>
+                            disabled>
                     </div>
                     <div class="col-md-4">
                         <label for="lastName" class="form-label">User Last Name</label>
                         <input type="text" class="form-control" id="lastName" v-model="state.reservation.user.last_name"
-                            placeholder="Enter Last Name" required>
+                            disabled>
                     </div>
                     <div class="col-md-4">
                         <label for="trotinetteModel" class="form-label">Trotinette Model</label>
                         <input type="text" class="form-control" id="trotinetteModel"
-                            v-model="state.reservation.trotinette.model" placeholder="Enter Trotinette Model" required>
+                            v-model="state.reservation.trotinette.model" disabled>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <label for="category" class="form-label">Trotinette Category</label>
                         <input type="text" class="form-control" id="category"
-                            v-model="state.reservation.trotinette.category" placeholder="Enter Trotinette Category"
-                            required>
+                            v-model="state.reservation.trotinette.category" disabled>
                     </div>
                     <div class="col-md-4">
                         <label for="pickUpLocation" class="form-label">Pick Up Location</label>
                         <input type="text" class="form-control" id="pickUpLocation"
-                            v-model="state.reservation.pick_up_location.name" placeholder="Enter Pick Up Location" required>
+                            v-model="state.reservation.pick_up_location.name" disabled>
                     </div>
                     <div class="col-md-4">
                         <label for="dropOffLocation" class="form-label">Drop Off Location</label>
                         <input type="text" class="form-control" id="dropOffLocation"
-                            v-model="state.reservation.drop_off_location.name" placeholder="Enter Drop Off Location"
-                            required>
+                            v-model="state.reservation.drop_off_location.name" disabled>
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -52,14 +50,14 @@
                     <div class="col-md-4">
                         <label for="reservationHours" class="form-label">Reservation Hours</label>
                         <input type="number" class="form-control" id="reservationHours"
-                            v-model="state.reservation.reservation_hours" placeholder="Enter Reservation Hours" required>
+                            v-model="state.reservation.reservation_hours" required>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <label for="totalCost" class="form-label">Total Cost</label>
                         <input type="number" class="form-control" id="totalCost" v-model="state.reservation.total_cost"
-                            placeholder="Enter Total Cost" required>
+                            required>
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary mt-5">Submit</button>
@@ -102,7 +100,7 @@ export default defineComponent({
 
         const editReservation = async () => {
             const result = { ...state.reservation };
-            //await trotinettes.updateReservation(result)
+            await trotinettes.updateReservation(result)
             emit('update', state.reservation);
             emit('close');
         }

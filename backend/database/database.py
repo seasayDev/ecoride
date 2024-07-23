@@ -667,6 +667,34 @@ class Database:
             return False
         finally:
             cursor.close()
+        
+    def update_reservation(self, reservation_id, start_date, end_date, reservation_hours, total_cost):
+        connection = self.get_connection()
+        cursor = connection.cursor()
+        try:
+            cursor.execute("""
+            UPDATE reservations
+            SET 
+                start_date = ?,
+                end_date = ?,
+                reservation_hours = ?,
+                total_cost = ?
+            WHERE id_reservation = ?
+            """, (
+                start_date, 
+                end_date, 
+                reservation_hours, 
+                total_cost, 
+                reservation_id
+            ))
+            connection.commit()
+            return True
+        except Exception as e:
+            connection.rollback()
+            print(f"Error updating reservation: {e}")
+            return False
+        finally:
+            cursor.close()
 
 
 
