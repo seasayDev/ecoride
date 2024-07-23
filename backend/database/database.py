@@ -627,6 +627,11 @@ class Database:
         cursor.close()
         return reservations
 
+    def decrease_trotinette_quantity(self, id_trotinette):
+        cursor = self.get_connection()
+        cursor.execute("UPDATE trotinette SET qte = qte - 1 WHERE id_trotinette = ?", (id_trotinette,))
+        cursor.commit()
+
 
     # Logic Facturation
 

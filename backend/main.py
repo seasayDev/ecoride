@@ -431,7 +431,17 @@ def unlock_trotinette():
 
     db = get_db()
     try:
+    
+        reservation = db.get_reservation_par_id(id_reservation)
+        if not reservation:
+            return jsonify({'error': 'Reservation not found'}), 404
+
+        id_trotinette = reservation[6]  # assuming the 7th column is trotinette_id
+
         db.delete_reservation(id_reservation)
+
+        db.decrease_trotinette_quantity(id_trotinette)
+
         return jsonify({'message': 'Trotinette deverrouiller avec succès'}), 200
     except Exception as e:
         app.logger.error(f"Error unlocking trotinette: {e}")
