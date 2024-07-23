@@ -130,3 +130,23 @@ CREATE TABLE IF NOT EXISTS payment_history (
 -- -- ('5555555555555555', '01/25', '789', 'Alice test2', 5);
 
 
+CREATE TABLE IF NOT EXISTS facturation (
+    id_facturation INTEGER PRIMARY KEY,
+    nom VARCHAR(50),
+    prenom VARCHAR(50),
+    adresse TEXT,
+    ville VARCHAR(50),
+    province VARCHAR(50),
+    code_postal VARCHAR(10),
+    telephone VARCHAR(20),
+    amount DECIMAL(10, 2),  
+    date_facturation DATETIME DEFAULT CURRENT_TIMESTAMP,  
+    user_id INTEGER,
+    reservation_id INTEGER,
+    FOREIGN KEY (user_id) REFERENCES users (id_user),
+    FOREIGN KEY (reservation_id) REFERENCES reservations (id_reservation)
+);
+
+
+
+

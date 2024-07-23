@@ -507,6 +507,80 @@ def update_reservation():
     except Exception as e:
         app.logger.error(f"Error updating reservation: {e}")
         return jsonify({'error': 'Internal Server Error'}), 500
+@app.route('/unlockTrotinette', methods=['POST'])
+def unlock_trotinette():
+    data = request.get_json()
+    id_reservation = data.get('id_reservation')
+
+    if not id_reservation:
+        return jsonify({'error': 'Reservation ID is required'}), 400
+
+    db = get_db()
+    try:
+    
+        reservation = db.get_reservation_par_id(id_reservation)
+        if not reservation:
+            return jsonify({'error': 'Reservation not found'}), 404
+
+        id_trotinette = reservation[6]  # assuming the 7th column is trotinette_id
+
+        db.delete_reservation(id_reservation)
+
+        db.decrease_trotinette_quantity(id_trotinette)
+
+        return jsonify({'message': 'Trotinette deverrouiller avec succès'}), 200
+    except Exception as e:
+        app.logger.error(f"Error unlocking trotinette: {e}")
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+
+# Logique facturation
+@app.route('/facturation', methods=['POST'])
+def add_facturation():
+    data = request.get_json()
+    id_user = data.get('id_user')
+    if not id_user:
+        return jsonify({"error": "User ID is required"}), 400
+    
+    required_fields = ["nom", "prenom", "adresse", "ville", "province", "codePostal", "telephone", "montant"]
+    if not all(data.get(field) for field in required_fields):
+        return jsonify({"error": "All fields are required."}), 400
+    
+    try:
+        get_db().add_facturation(id_user, data['nom'], data['prenom'], data['adresse'], 
+                                 data['ville'], data['province'], data['codePostal'], 
+                                 data['telephone'], data['montant'])
+        return jsonify({"message": "Facturation ajoutée avec succès"}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/facturation/<id_user>', methods=['GET'])
+def get_facturation(id_user):
+    try:
+        facturation = get_db().get_facturation(id_user)
+        if facturation:
+            return jsonify(facturation), 200
+        else:
+            return jsonify({"message": "Aucune facturation trouvée"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/facturation/<id_user>', methods=['PUT'])
+def update_facturation(id_user):
+    data = request.get_json()
+    required_fields = ["nom", "prenom", "adresse", "ville", "province", "codePostal", "telephone", "montant"]
+    if not all(data.get(field) for field in required_fields):
+        return jsonify({"error": "All fields are required."}), 400
+    
+    try:
+        get_db().update_facturation(id_user, data['nom'], data['prenom'], data['adresse'], 
+                                    data['ville'], data['province'], data['codePostal'], 
+                                    data['telephone'], data['montant'])
+        return jsonify({"message": "Facturation mise à jour avec succès"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 
 
 if __name__ == "__main__":

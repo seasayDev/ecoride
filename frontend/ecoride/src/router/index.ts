@@ -14,6 +14,9 @@ import ReservationDetails from '@/components/reservationDetails/ReservationDetai
 import ReservationConfirmed from '@/components/reservationDetails/ReservationConfirmed.vue'
 import Promotions from '@/components/promotions/promotion.vue'
 import ReservationHistory from '@/components/reservationHistory/ReservationHistory.vue'
+import Facturation from '@/components/facturation/Facturation.vue'
+import EditFacturation from '@/components/editFacturation/EditFacturation.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,6 +34,8 @@ const router = createRouter({
     { path: '/payement', name: 'Payement', component: Payement },
     { path: '/promotions', name: 'Promotions', component: Promotions, meta: { requiresAuth: true } },
     { path: '/reservation-details', name: 'ReservationDetails', component: ReservationDetails },
+    { path: '/facturation', name:'Facturation', component: Facturation},
+    { path: '/editFacturation', name:'EditFacturation', component: EditFacturation},
     {
       path: '/reservation-confirmed',
       name: 'ReservationConfirmed',

@@ -37,7 +37,7 @@ export default defineComponent({
       required: true
     }
   },
-  emits: ['reserve'],
+  emits: ['reserve', 'update-quantity'],
   setup(props, { emit }) {
     const showCommentairesModal = ref(false);
 
@@ -94,7 +94,7 @@ export default defineComponent({
   color: white;
   font-weight: bold;
   border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
+  border-top-right-radius: 0;
   box-sizing: border-box;
 }
 

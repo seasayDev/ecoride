@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row">
       <ScooterCard v-for="(scooter, index) in state.scooters" :key="index" :class="gridClass" :scooter="scooter"
-        @reserve="openModal(scooter)">
+        @reserve="openModal(scooter)" @update-quantity="updateQuantity">
       </ScooterCard>
     </div>
     <ReservationModal :isVisible="state.showModal" v-if="state.showModal" :trotinette="state.selectedTrotinette"
@@ -32,8 +32,12 @@ export default defineComponent({
       selectedTrotinette: {} as Trotinette,
     });
 
-    onMounted(async () => {
+    const fetchTrotinettes = async () => {
       state.scooters = await trotinettes.getTrotinettes();
+    };
+
+    onMounted(async () => {
+      await fetchTrotinettes();
     });
 
     const openModal = (trotinette: Trotinette) => {
@@ -46,8 +50,14 @@ export default defineComponent({
     };
 
     const handleReservation = async () => {
-      // Actualiser la liste des trottinettes après une réservation réussie
-      state.scooters = await trotinettes.getTrotinettes();
+      await fetchTrotinettes();
+    };
+
+    const updateQuantity = (id_trotinette: number, quantity: number) => {
+      const scooter = state.scooters.find(s => s.id_trotinette === id_trotinette);
+      if (scooter) {
+        scooter.qte = quantity;
+      }
     };
 
     return {
@@ -57,10 +67,10 @@ export default defineComponent({
       openModal,
       closeModal,
       handleReservation,
+      updateQuantity,
     };
   },
 });
 </script>
   
 <style scoped></style>
-  

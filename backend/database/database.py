@@ -696,6 +696,46 @@ class Database:
         finally:
             cursor.close()
 
+    def decrease_trotinette_quantity(self, id_trotinette):
+        cursor = self.get_connection()
+        cursor.execute("UPDATE trotinette SET qte = qte - 1 WHERE id_trotinette = ?", (id_trotinette,))
+        cursor.commit()
+
+
+    # Logic Facturation
+
+    def add_facturation(self, user_id, nom, prenom, adresse, ville, province, code_postal, telephone, montant):
+        connection = self.get_connection()
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO facturation (nom, prenom, adresse, ville, province, code_postal, telephone, amount, user_id) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (nom, prenom, adresse, ville, province, code_postal, telephone, montant, user_id))
+        connection.commit()
+
+    def get_facturation(self, user_id):
+        cursor = self.get_connection().cursor()
+        cursor.execute("SELECT nom, prenom, adresse, ville, province, code_postal, telephone, amount FROM facturation WHERE user_id = ? ORDER BY date_facturation DESC LIMIT 1", (user_id,))
+        facturation = cursor.fetchone()
+        if facturation:
+            return {
+                'nom': facturation[0],
+                'prenom': facturation[1],
+                'adresse': facturation[2],
+                'ville': facturation[3],
+                'province': facturation[4],
+                'codePostal': facturation[5],
+                'telephone': facturation[6],
+                'montant': facturation[7]
+            }
+        return None
+
+    def update_facturation(self, user_id, nom, prenom, adresse, ville, province, code_postal, telephone, montant):
+        connection = self.get_connection()
+        cursor = connection.cursor()
+        cursor.execute(
+        "UPDATE facturation SET nom = ?, prenom = ?, adresse = ?, ville = ?, "
+        "province = ?, code_postal = ?, telephone = ?, amount = ? WHERE user_id = ?",
+        (nom, prenom, adresse, ville, province, code_postal, telephone, montant, user_id))
+        connection.commit()
 
 
         
