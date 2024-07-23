@@ -6,8 +6,8 @@ default: run
 # Target to create a virtual environment and install dependencies
 setup:
 	@echo "Creating virtual environment..."
-	 virtualenv myenv
-	# python3 -m venv myenv
+	 #virtualenv myenv
+	python3 -m venv myenv
 	@echo "Virtual environment created."
 
 # Target to activate the virtual environment
