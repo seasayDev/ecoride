@@ -507,6 +507,7 @@ def update_reservation():
     except Exception as e:
         app.logger.error(f"Error updating reservation: {e}")
         return jsonify({'error': 'Internal Server Error'}), 500
+    
 @app.route('/unlockTrotinette', methods=['POST'])
 def unlock_trotinette():
     data = request.get_json()

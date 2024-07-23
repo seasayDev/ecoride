@@ -148,5 +148,10 @@ CREATE TABLE IF NOT EXISTS facturation (
 );
 
 
+UPDATE users
+SET user_type = 'admin'
+WHERE id_user = 10;
+
+
 
 

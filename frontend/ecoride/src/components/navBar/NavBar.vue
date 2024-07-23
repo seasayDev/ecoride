@@ -28,7 +28,7 @@
         <router-link v-if="userStore.user" to="/" @click.prevent="deconnexion">Deconnexion</router-link>
       </li>
       <li>
-        <router-link v-if="userStore.user" to="/admin">Admin</router-link>
+        <router-link v-if="userStore.user?.session.role === 'admin'" to="/admin">Admin</router-link>
       </li>
       <li>
         <router-link v-if="userStore.user" to="/map">deplacement</router-link>
@@ -131,7 +131,7 @@ a:hover {
   position: absolute;
   background-color: #f9f9f9;
   min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
 }
 
