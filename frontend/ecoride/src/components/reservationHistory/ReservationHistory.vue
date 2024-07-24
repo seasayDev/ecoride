@@ -34,7 +34,10 @@
                 </div>
                 <button class="btn btn-primary mt-3" @click="deverrouiller(reservation.id_reservation)">Deverrouiller</button>
             </div>
+            
+            
         </div>
+        
         <div v-else class="alert alert-info" role="alert">
             No reservations found.
         </div>
@@ -46,6 +49,9 @@ import { defineComponent, ref, onMounted, inject } from 'vue';
 import axios from 'axios';
 import { Reservation, ReservationsService } from './reservationsService';
 import { userStore, setUser, getUserFromStorage } from "@/components/helpers/userSession";
+import { Reservation, ReservationsService } from '@/components/reservationHistory/reservationsService';
+
+
 
 export default defineComponent({
     name: 'ReservationHistory',
@@ -69,6 +75,16 @@ export default defineComponent({
             } finally {
                 loading.value = false;
             }
+        };
+
+        const cancelReservation = async (reservationId: number) => {
+        try {
+        await reservationsService.cancelReservation(reservationId);
+        // Mettre à jour la liste des réservations localement
+        reservations.value = reservations.value.filter(reservation => reservation.id_reservation !== reservationId);
+        } catch (err) {
+        error.value = 'Failed to cancel reservation';
+        }
         };
 
         const getImageSrc = (imageData: string) => {
@@ -159,3 +175,74 @@ export default defineComponent({
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 </style>
+
+<style scoped>
+.container {
+  margin-top: 20px;
+}
+
+.spinner-border {
+  display: block;
+  margin: 0 auto;
+}
+
+.img-thumbnail {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin-top: 10px;
+}
+
+.trotinette-image {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+}
+
+.reservation-card {
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+  padding-top: 40px; /* espace pour le bouton d'annulation */
+}
+
+.reservation-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.reservation-advanced {
+  display: none;
+}
+
+.reservation-card:hover .reservation-advanced {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: white;
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  z-index: 10;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cancel-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 5px;
+  z-index: 20; /* pour être sûr que le bouton est au-dessus de tout */
+}
+
+.cancel-button:hover {
+  background-color: #ff1a1a;
+}
+</style>
+

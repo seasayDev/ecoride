@@ -40,7 +40,19 @@ export class ReservationsService {
       return response.data
     } catch (error) {
       console.error('Error fetching reservations:', error)
-      throw error
+      throw error;
+    }
+  }
+  public async cancelReservation(reservationId: number): Promise<void> {
+    try {
+      const fullUrl = `${this.url}/${reservationId}`;
+      console.log('Canceling reservation at URL:', fullUrl);
+      const response = await axios.delete(fullUrl, { withCredentials: true });
+      console.log('Response from server:', response.data);
+    } catch (error) {
+      console.error('Error canceling reservation:', error.response ? error.response.data : error.message);
+      throw new Error('Failed to cancel reservation');
     }
   }
 }
+const reservationsService = new ReservationsService('/api/reservations');

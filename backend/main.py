@@ -17,8 +17,11 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 app.secret_key = 'Xp2s5v8y/B?D(G+KbPeShVmYq3t6w9z$'
 
+CORS(app)
 CORS(app, resources={r"/*": {'origins': "*"}})
 CORS(app, supports_credentials=True)
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:5173"}})
+
 with open('email.yaml') as f:
     email_settings = yaml.safe_load(f)
 
