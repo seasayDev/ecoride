@@ -17,8 +17,11 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 app.secret_key = 'Xp2s5v8y/B?D(G+KbPeShVmYq3t6w9z$'
 
+CORS(app)
 CORS(app, resources={r"/*": {'origins': "*"}})
 CORS(app, supports_credentials=True)
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:5173"}})
+
 with open('email.yaml') as f:
     email_settings = yaml.safe_load(f)
 
@@ -419,6 +422,15 @@ def get_reservations():
     except Exception as e:
         app.logger.error(f"Error fetching reservations: {e}")
         return jsonify({'error': 'Internal Server Error'}), 500
+    
+def delete_reservation(reservation_id):
+    try:
+        get_db().delete_reservation(reservation_id)
+        return '', 204
+    except Exception as e:
+        app.logger.error(f"Error deleting reservation: {e}")
+        return jsonify({'error': 'Internal Server Error'}), 500
+
 
 
 if __name__ == "__main__":
