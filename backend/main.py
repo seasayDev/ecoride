@@ -532,7 +532,7 @@ def unlock_trotinette():
 
         db.decrease_trotinette_quantity(id_trotinette)
 
-        return jsonify({'message': 'Trotinette deverrouiller avec succès'}), 200
+        return jsonify({'message': 'Réservation annulée avec succès'}), 200
     except Exception as e:
         app.logger.error(f"Error unlocking trotinette: {e}")
         return jsonify({'error': 'Internal Server Error'}), 500

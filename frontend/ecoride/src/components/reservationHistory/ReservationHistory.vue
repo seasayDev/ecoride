@@ -32,7 +32,8 @@
                         }}</p>
                     </div>
                 </div>
-                <button class="btn btn-primary mt-3" @click="deverrouiller(reservation.id_reservation)">Deverrouiller</button>
+                <button class="btn btn-danger mt-3" @click="deverrouiller(reservation.id_reservation)">Annuler </button>
+                <!-- <button class="btn btn-danger mt-3" @click="cancelReservation(reservation.id_reservation)">Annuler</button> -->
             </div>
             
             
@@ -47,7 +48,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, inject } from 'vue';
 import axios from 'axios';
-import { Reservation, ReservationsService } from './reservationsService';
+// import { Reservation, ReservationsService } from './reservationsService';
 import { userStore, setUser, getUserFromStorage } from "@/components/helpers/userSession";
 import { Reservation, ReservationsService } from '@/components/reservationHistory/reservationsService';
 
