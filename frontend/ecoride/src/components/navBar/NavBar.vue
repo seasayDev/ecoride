@@ -1,168 +1,62 @@
 <template>
-  <nav>
-    <ul>
-      <li>
-        <router-link to="/">Home</router-link>
-      </li>
-      <li>
-        <router-link to="/login" v-if="!userStore.user">Connexion</router-link>
-      </li>
-      <li>
-        <router-link v-if="userStore.user" to="/support">Support</router-link>
-      </li>
-
-      <li class="dropdown" v-if="userStore.user">
-        <a href="javascript:void(0)" class="dropbtn">Mon compte</a>
-        <div class="dropdown-content">
-          <router-link to="/profil">Modifier Profil</router-link>
-          <router-link to="/facturation">Modifier Facturation</router-link>
-        </div>
-      </li>
-
-      <li>
-        <router-link v-if="userStore.user" to="/aide">Aide</router-link>
-      </li>
-
-
-      <li>
-        <router-link v-if="userStore.user" to="/" @click.prevent="deconnexion">Deconnexion</router-link>
-      </li>
-      <li>
-        <router-link v-if="userStore.user?.session.role === 'admin'" to="/admin">Admin</router-link>
-      </li>
-      <li>
-        <router-link v-if="userStore.user" to="/map">deplacement</router-link>
-      </li>
-      <li>
-        <router-link v-if="userStore.user" to="/reservations">Reservations</router-link>
-      </li>
-    </ul>
-
-    <span v-if="userStore.user" class="username">{{ getUserName }}</span>
-  </nav>
+  <header class="topbar bg-white border-bottom">
+    <div class="container d-flex align-items-center justify-content-between h-100">
+      <router-link to="/" class="brand">
+        <span class="brand-dot"></span>
+        EcoRide
+      </router-link>
+      <nav class="nav">
+        <router-link v-if="!userStore.user" to="/login">Connexion</router-link>
+        <template v-else>
+          <router-link to="/" class="me-3">Accueil</router-link>
+          <router-link to="/reservations" class="me-3">Réservations</router-link>
+          <router-link to="/aide" class="me-3">Aide</router-link>
+          <router-link to="/support" class="me-3">Support</router-link>
+          <span class="username me-3">{{ userStore.user?.session.fname }}</span>
+          <a href="javascript:void(0)" @click.prevent="deconnexion">Déconnexion</a>
+        </template>
+      </nav>
+    </div>
+  </header>
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue'
 import { useRouter } from 'vue-router'
-import { defineComponent, reactive, computed, inject } from 'vue'
-import { userStore, setUser, getUserFromStorage } from '@/components/helpers/userSession'
-import { LoginUser } from '../login'
+import { LoginUser } from '../login/login';
+import { userStore, setUser } from '@/components/helpers/userSession'
 
 export default defineComponent({
   name: 'NavBar',
   setup() {
-    const loginUser = inject('loginUser') as LoginUser
     const router = useRouter()
+    const loginUser = new LoginUser('http://127.0.0.1:5000')
 
-    const state = reactive({
-      user: {} as Object | null,
-      userName: ''
-    })
-
-    getUserFromStorage()
-
-    const getUserName = computed(() => {
-      return userStore.user?.session.fname
-    })
-
-    const deconnexion = () => {
-      loginUser.deconnexion(userStore.user?.session.id)
+    const deconnexion = async () => {
+      await loginUser.deconnexion(userStore.user?.session.id)
       setUser(null)
       router.push('/')
     }
-
-    return {
-      state,
-      deconnexion,
-      router,
-      userStore,
-      loginUser,
-      getUserName
-    }
+    return { userStore, deconnexion }
   }
 })
 </script>
 
 <style scoped>
-nav {
-  background-color: #333;
-  padding: 1rem;
+.topbar { position: sticky; top: 0; z-index: 1030; height: 64px; }
+.brand {
+  font-weight: 800; letter-spacing: -0.2px; color: #16a34a; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 8px;
 }
-
-ul {
-  list-style: none;
-  display: flex;
-  gap: 1rem;
+.brand-dot {
+  width: 18px; height: 18px; background: #16a34a; border-radius: 999px; display: inline-block;
 }
-
-li {
-  display: inline;
-  position: relative;
+.nav {
+  display: flex; align-items: center; gap: 12px;
 }
-
-a {
-  color: white;
-  text-decoration: none;
+.nav a {
+  color: #1f2937; text-decoration: none; font-weight: 500; padding: 6px 8px; border-radius: 0.5rem;
 }
-
-a:hover {
-  text-decoration: underline;
-}
-
-.username {
-  position: absolute;
-  color: white;
-  right: 33px;
-  top: 16px;
-}
-
-/* Dropdown styles */
-.dropdown .dropbtn {
-  cursor: pointer;
-  color: white;
-  text-decoration: none;
-  background-color: #333;
-  border: none;
-  padding: 0;
-}
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #f9f9f9;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  z-index: 1;
-}
-
-.dropdown-content a {
-  color: black;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-}
-
-.dropdown-content a:hover {
-  background-color: #f1f1f1;
-}
-
-.dropdown:hover .dropdown-content {
-  display: block;
-}
-
-.dropdown:hover .dropbtn {
-  background-color: #3e8e41;
-}
-
-/* Responsive adjustments */
-@media screen and (max-width: 600px) {
-  ul {
-    flex-direction: column;
-    gap: 0;
-  }
-
-  .dropdown-content {
-    position: static;
-  }
-}
+.nav a:hover { background-color: #f3f4f6; color: #16a34a; }
+.username { color: #374151; font-weight: 600; }
 </style>

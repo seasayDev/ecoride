@@ -8,7 +8,25 @@ class Database:
     def get_connection(self):
         if self.connection is None:
             self.connection = sqlite3.connect('./database/data.db')
+            self.connection.row_factory = sqlite3.Row
+            self._migrate()
         return self.connection
+
+    def _migrate(self):
+        cur = self.connection.cursor()
+        cur.executescript("""
+CREATE TABLE IF NOT EXISTS reviews (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_email TEXT NOT NULL,
+    trotinette_id INTEGER NOT NULL,
+    rating INTEGER NOT NULL,
+    comment TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_email) REFERENCES users(email),
+    FOREIGN KEY (trotinette_id) REFERENCES trotinette(id_trotinette)
+);
+        """)
+        self.connection.commit()
 
     def disconnect(self):
         if self.connection is not None:
@@ -29,13 +47,13 @@ class Database:
 
     def get_user(self, email):
         cursor = self.get_connection().cursor()
-        cursor.execute(("select salt, hash,first_name,last_name,user_type,email,id_user from users where email=?"),
+        cursor.execute(("select hash,first_name,last_name,user_type,email,id_user from users where email=?"),
                        (email,))
         user = cursor.fetchone()
         if user is None:
             return None
         else:
-            return user[0], user[1], user[2], user[3], user[4], user[5], user[6]
+            return user[0], user[1], user[2], user[3], user[4], user[5]
 
     def get_user_by_email(self, email):
         cursor = self.get_connection().cursor()
@@ -411,6 +429,31 @@ class Database:
                        (bool, id_rabais))
         cursor.commit()
 
+    # Reviews
+    def create_review(self, user_email, trotinette_id, rating, comment):
+        connection = self.get_connection()
+        cursor = connection.cursor()
+        cursor.execute(
+            "INSERT INTO reviews (user_email, trotinette_id, rating, comment) VALUES (?, ?, ?, ?)",
+            (user_email, trotinette_id, rating, comment),
+        )
+        connection.commit()
+        return cursor.lastrowid
+
+    def get_reviews(self, trotinette_id):
+        cursor = self.get_connection().cursor()
+        cursor.execute(
+            "SELECT id, user_email, rating, comment, created_at FROM reviews WHERE trotinette_id = ? ORDER BY created_at DESC",
+            (trotinette_id,),
+        )
+        return cursor.fetchall()
+
+    def get_pub_active(self):
+        cursor = self.get_connection().cursor()
+        cursor.execute("SELECT * FROM rabais where active = ?", (1,))
+        return cursor.fetchall()
+
+
     def get_reservation_par_id(self, id_reservation):
         conn = self.get_connection()
         cursor = conn.cursor()
@@ -437,12 +480,12 @@ class Database:
 
     def get_user_admin(self):
         cursor = self.get_connection().cursor()
-        cursor.execute("SELECT users.id_user, users.first_name, users.last_name,"
-                       + "users.email, users.date_of_birth, "
-                         + "users.phone, users.user_type, users.salt, users.hash," +
-                       "addresses.address AS address, addresses.city AS city, addresses.province AS province, addresses.postal_code AS postal_code " +
-                       "FROM users " +
-                       "INNER JOIN addresses ON users.address_id = addresses.id_address")
+        cursor.execute(("SELECT users.id_user, users.first_name, users.last_name,"
+                        "users.email, users.date_of_birth, "
+                        "users.phone, users.user_type, users.hash,"
+                        "addresses.address AS address, addresses.city AS city, addresses.province AS province, addresses.postal_code AS postal_code "
+                        "FROM users "
+                        "INNER JOIN addresses ON users.address_id = addresses.id_address"))
         users = cursor.fetchall()
         return users
 
@@ -464,10 +507,10 @@ class Database:
             "DELETE FROM users where id_user = ?", (id_user))
         cursor.commit()
 
-    def update_user_password(self, id, salt, hash):
+    def update_user_password(self, id, hash):
         cursor = self.get_connection().cursor()
         cursor.execute(
-            'UPDATE users SET salt =? ,hash =? where id_user =? ', (salt, hash, id))
+            'UPDATE users SET hash =? where id_user =? ', (hash, id))
         cursor.connection.commit()
 
     def get_trotinette_info(self, id):

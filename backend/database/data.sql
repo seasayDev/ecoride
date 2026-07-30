@@ -152,6 +152,17 @@ UPDATE users
 SET user_type = 'admin'
 WHERE id_user = 10;
 
+CREATE TABLE IF NOT EXISTS reviews (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_email TEXT NOT NULL,
+    trotinette_id INTEGER NOT NULL,
+    rating INTEGER NOT NULL,
+    comment TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_email) REFERENCES users(email),
+    FOREIGN KEY (trotinette_id) REFERENCES trotinette(id_trotinette)
+);
+
 
 
 

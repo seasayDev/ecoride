@@ -4,7 +4,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="reservationModalLabel">{{ trotinette.name }}</h5>
+          <h5 class="modal-title" id="reservationModalLabel">{{ trotinette.name ?? "" ?? "" }}</h5>
           <button type="button" class="btn-close" @click="closeModal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -28,13 +28,13 @@
             <div class="row">
               <div class="col-md-6 form-group">
                 <label for="pickup-location">Lieu de départ :</label>
-                <input type="text" class="form-control" :placeholder="trotinette.location.name" required disabled>
+                <input type="text" class="form-control" :placeholder="trotinette.location.name ?? """ required disabled>
               </div>
               <div class="col-md-6 form-group">
                 <label for="location" class="form-label">Lieu de retour :</label>
                 <select class="form-control" id="location" v-model="state.dropOutLocation" required>
                   <option v-for="location in state.locations" :key="location.id" :value="location">
-                    {{ location.name }}
+                    {{ location.name ?? "" ?? "" }}
                   </option>
                 </select>
               </div>
@@ -54,8 +54,8 @@
             <p><strong>Date de réservation :</strong> <span>{{ reservationDate }}</span></p>
             <p><strong>Heure de début :</strong> <span>{{ state.reservationTime }}</span></p>
             <p><strong>Durée de réservation (heures) :</strong> <span>{{ reservationDuration }}</span></p>
-            <p><strong>Lieu de départ :</strong> <span>{{ trotinette.location.name }}</span></p>
-            <p><strong>Lieu de retour :</strong> <span>{{ state.dropOutLocation.name }}</span></p>
+            <p><strong>Lieu de départ :</strong> <span>{{ trotinette.location.name ?? "" }}</span></p>
+            <p><strong>Lieu de retour :</strong> <span>{{ state.dropOutLocation.name ?? "" }}</span></p>
             <p><strong>Coût total :</strong> <span>{{ costToshow }}</span></p>
             <div class="d-flex justify-content-between mt-3">
               <button class="btn btn-secondary w-50 me-2" @click="editReservation">Éditer</button>
@@ -71,9 +71,9 @@
 <script lang="ts">
 import { computed, defineComponent, PropType, ref, watch, inject, onMounted, reactive } from 'vue';
 import { useRouter } from 'vue-router';
-import { Trotinette } from '../scooterCard';
+import { Trotinette } from '../scooterCard/scooterCard';
 import { userStore, getUserFromStorage } from "@/components/helpers/userSession";
-import { Location, Newscooter, GetTrotinettes } from '../admin';
+import { Location, Newscooter, GetTrotinettes } from '../admin/admin';
 
 
 export default defineComponent({
@@ -135,8 +135,8 @@ export default defineComponent({
         reservationDate: reservationDate.value,
         reservationTime: state.reservationTime,
         reservationDuration: reservationDuration.value,
-        dropOutLocation: state.dropOutLocation.id_location,
-        dropOutName: state.dropOutLocation.name,
+        dropOutLocation: state.dropOutLocation.id ?? "",
+        dropOutName: state.dropOutLocation.name ?? "",
         totalCost: costToshow.value,
       };
 

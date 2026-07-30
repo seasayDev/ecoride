@@ -26,6 +26,7 @@
 import { defineComponent, ref, computed } from 'vue';
 import CommentairesModal from '@/components/review/review.vue'; // Ajuster le chemin d'importation
 import { Trotinette } from './scooterCard';
+import type { PropType } from "vue"
 
 export default defineComponent({
   components: {

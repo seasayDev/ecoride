@@ -20,9 +20,9 @@ export default defineComponent({
     const mapContainer = ref<HTMLDivElement | null>(null);
 
     // Coordinate locations
-    const pavillonCoordinates = [45.50837995371091, -73.5687737935345];
-    const arrivalCoordinates = [45.52044569263199, -73.56796069758204];
-    const dansePvCoordinates = [45.51448129714742, -73.56079792313432];
+    const pavillonCoordinates = [45.50837995371091, -73.5687737935345] as [number, number];
+    const arrivalCoordinates = [45.52044569263199, -73.56796069758204] as [number, number];
+    const dansePvCoordinates = [45.51448129714742, -73.56079792313432] as [number, number];
 
     // Path coordinates
     const pathCoordinates = [
@@ -70,7 +70,7 @@ export default defineComponent({
     ];
 
     // Initial coordinates for Montreal
-    const montrealCoordinates = [45.5017, -73.5673];
+    const montrealCoordinates = [45.5017, -73.5673] as [number, number];
 
     onMounted(() => {
       if (mapContainer.value) {
@@ -81,7 +81,7 @@ export default defineComponent({
         }).addTo(map);
 
         // Add a green transparent circle centered on Montreal
-        L.circle(montrealCoordinates, {
+        L.circleMarker(montrealCoordinates, {
           color: 'green',
           fillColor: 'green',
           fillOpacity: 0.1,
@@ -95,7 +95,7 @@ export default defineComponent({
           iconAnchor: [19, 19],
         });
 
-        const scooterMarker = L.marker(pathCoordinates[0], { icon: scooterIcon }).addTo(map)
+        const scooterMarker = L.marker(pathCoordinates[0] as [number, number], { icon: scooterIcon }).addTo(map)
           .bindPopup('Moving Scooter')
           .openPopup();
 
@@ -111,8 +111,8 @@ export default defineComponent({
             return;
           }
 
-          scooterMarker.setLatLng(pathCoordinates[step]);
-          pathLine.addLatLng(pathCoordinates[step]);
+          scooterMarker.setLatLng(pathCoordinates[step] as [number, number]);
+          pathLine.addLatLng(pathCoordinates[step] as [number, number]);
         }, 1000);
 
         // Custom blue dot icon for locations

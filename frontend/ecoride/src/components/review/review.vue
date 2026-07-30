@@ -33,7 +33,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType, ref } from 'vue';
-import { Trotinette } from './scooterCard';
+import { Trotinette } from '../scooterCard/scooterCard';
 
 export default defineComponent({
   props: {
